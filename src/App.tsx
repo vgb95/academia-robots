@@ -6,7 +6,6 @@ import { LabsIndexPage, LabPage } from './components/Labs';
 import { PracticePage } from './components/Practice';
 import { DiagramGalleryPage } from './components/DiagramGallery';
 import { RoadmapPage } from './components/Roadmap';
-import { ShortcutsProvider } from './components/Shortcuts';
 import { StudyPlanPage } from './components/StudyPlan';
 import { OfflineGuidePage } from './components/OfflineGuide';
 import { useRoute } from './router';
@@ -45,5 +44,5 @@ export default function App() {
     default: content = <NotFound />;
   }
 
-  return <ShortcutsProvider><Layout>{content}</Layout></ShortcutsProvider>;
+  return <Layout>{content}</Layout>;
 }

@@ -1,5 +1,5 @@
 // Auditoría de integridad del contenido. Ejecuta: node scripts/verify.mjs
-import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 const read = p => readFileSync(p, 'utf8');
@@ -69,12 +69,6 @@ else ok(`${labBlocks.length} laboratorios íntegros: aristas, pasos y checklist 
 const cjkLabs = labSrc.split('\n').map((line, i) => /[\u3040-\u9fff\u3400-\u4dbf\uac00-\ud7af]/.test(line) ? i + 1 : null).filter(Boolean);
 if (cjkLabs.length) fail('Caracteres CJK en src/data/labs.ts: ' + cjkLabs.slice(0, 8).join(', '));
 else ok('Sin caracteres CJK en laboratorios');
-
-// Fuentes locales (offline)
-const fontFiles = [400, 500, 600, 700, 800].map(w => join('public', 'fonts', `jetbrains-mono-${w}.woff2`));
-const badFonts = fontFiles.filter(p => !existsSync(p) || statSync(p).size === 0);
-if (badFonts.length) fail('Fuentes JetBrains Mono ausentes o vacías: ' + badFonts.join(', '));
-else ok(`${fontFiles.length} fuentes JetBrains Mono presentes y no vacías`);
 
 // Caracteres no españoles
 const badChars = /[\u3040-\u9fff\u0400-\u04ff\u0600-\u06ff\uac00-\ud7af]/;

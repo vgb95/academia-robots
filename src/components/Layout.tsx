@@ -4,63 +4,47 @@ import { tracks, findLesson } from '../data/tracks';
 import { useStore } from '../state/store';
 import { href, go, useRoute } from '../router';
 
-const folderColors = ['', 'violet', 'blue', 'pink', 'olive', '', 'violet', 'blue', 'pink', 'olive', '', 'violet', 'blue'];
-
 function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const route = useRoute();
   const { state } = useStore();
   const currentTrack = route.name === 'lesson'
-    ? findLesson(route.id)?.track
+    ? (() => { const id = route.id; for (const t of tracks) for (const m of t.modules) if (m.lessons.some(l => l.id === id)) return t; })()
     : 'track' in route ? tracks.find(t => t.id === route.track)
     : undefined;
-  const total = tracks.reduce((n, t) => n + t.modules.flatMap(m => m.lessons).length, 0);
-  const done = tracks.reduce((n, t) => n + t.modules.flatMap(m => m.lessons).filter(l => state.progress[l.id] === 'done').length, 0);
-  const pct = Math.round(done / Math.max(1, total) * 100);
-
   return <nav className="sidebar" onClick={onNavigate}>
-    <div className="sidebar-course-head"><strong>Curso</strong><span className="sidebar-course-count">{total} lecciones</span></div>
-    {tracks.map(t => (
-      <div key={t.id}>
-        <a className={`folder-row ${currentTrack?.id === t.id ? 'active' : ''}`} href={href(`/track/${t.id}`)}>
-          <span className="folder-icon">▤</span>
-          <span className="folder-name">{t.title.replace(' desde cero', '')}</span>
-        </a>
-        {(currentTrack?.id === t.id ? t.modules : []).map((m, i) => {
-          const md = m.lessons.filter(l => state.progress[l.id] === 'done').length;
-          return <a key={m.id} className="folder-row" style={{ paddingLeft: 26 }} href={href(`/track/${t.id}/${m.id}`)}>
-            <span className={`folder-icon ${folderColors[i % folderColors.length]}`}>▸</span>
-            <span className="folder-name">{m.title}</span>
-            <span className="folder-count">{md}/{m.lessons.length}</span>
-          </a>;
-        })}
-      </div>
-    ))}
-    <div className="sidebar-course-head" style={{ marginTop: 18 }}><strong>Herramientas</strong></div>
+    <a className="brand" href={href('/')}><span className="brand-mark">⬢</span><span>Academia<strong>Robótica & IA</strong></span></a>
+    <div className="sidebar-section-title">TRACKS</div>
+    {tracks.map(t => <a key={t.id} className={`side-link ${currentTrack?.id === t.id ? 'active' : ''}`} href={href(`/track/${t.id}`)}>
+      <span className="side-icon">{t.icon}</span><span>{t.title}</span>
+    </a>)}
+    {currentTrack && <>
+      <div className="sidebar-section-title">BLOQUES · {currentTrack.title.toUpperCase()}</div>
+      {currentTrack.modules.map((m, i) => {
+        const done = m.lessons.filter(l => state.progress[l.id] === 'done').length;
+        const p = Math.round(done / Math.max(1, m.lessons.length) * 100);
+        return <a key={m.id} className="side-link small" href={href(`/track/${currentTrack.id}/${m.id}`)}>
+          <span className="side-num">{String(i).padStart(2, '0')}</span><span className="side-label">{m.title}</span><span className="side-pct">{p}%</span>
+        </a>;
+      })}
+    </>}
+    <div className="sidebar-section-title">HERRAMIENTAS</div>
     {[
-      ['/laboratorio', '⬡', 'Laboratorio'], ['/practica', '✓', 'Práctica'],
+      ['/laboratorio', '◫', 'Laboratorio'], ['/practica', '✓', 'Práctica'],
+      ['/ruta', '⌁', 'Hoja de ruta'], ['/plan', '▦', 'Plan de estudio'],
+      ['/esquemas', '◇', 'Esquemas'],
       ['/library', '§', 'Biblioteca'], ['/projects', '⚒', 'Proyectos'],
       ['/glossary', '¶', 'Glosario'], ['/kit', '⌗', 'Banco y BOM'],
-      ['/ruta', '⌁', 'Hoja de ruta'], ['/plan', '▦', 'Plan de estudio'],
-      ['/esquemas', '◫', 'Esquemas'], ['/cases', '⛭', 'Casos reales'],
-      ['/flashcards', '◫', 'Flashcards'], ['/troubleshooting', '⚕', 'Diagnóstico'],
-      ['/cheatsheets', '≡', 'Chuletas'], ['/offline', '◉', 'Offline e iPad'],
-      ['/notes', '✎', 'Mis notas']
-    ].map(([path, icon, label]) => <a key={path} className="folder-row" href={href(path)}>
-      <span className="folder-icon">{icon}</span><span className="folder-name">{label}</span>
-    </a>)}
-    <div className="sidebar-progress">
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}><strong>PROGRESO</strong><span>{done} / {total}</span></div>
-      <div className="sidebar-progress-bar"><div className="sidebar-progress-fill" style={{ width: `${pct}%` }} /></div>
-    </div>
-    <div className="sidebar-foot">Offline · en tu iPad</div>
+      ['/cases', '⛭', 'Casos reales'], ['/flashcards', '◫', 'Flashcards'],
+      ['/troubleshooting', '⚕', 'Diagnóstico'], ['/cheatsheets', '≡', 'Chuletas'],
+      ['/offline', '◉', 'Offline e iPad'], ['/notes', '✎', 'Mis notas'], ['/search', '⌕', 'Buscar']
+    ].map(([path, icon, label]) => <a key={path} className="side-link" href={href(path)}><span className="side-icon">{icon}</span><span>{label}</span></a>)}
+    <div className="sidebar-foot">Hecho para aprenderse a fondo.<br />Offline, en tu iPad.</div>
   </nav>;
 }
 
 export function Layout({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [online, setOnline] = useState(navigator.onLine);
-  const [query, setQuery] = useState('');
-  const [night, setNight] = useState(false);
   const { needRefresh, updateServiceWorker } = useRegisterSW();
   const route = useRoute();
 
@@ -76,58 +60,23 @@ export function Layout({ children }: { children: ReactNode }) {
     else if (route.name === 'lesson') t = findLesson(route.id)?.track.id ?? '';
     document.documentElement.dataset.track = t;
   }, [route]);
-  useEffect(() => {
-    document.documentElement.dataset.theme = night ? 'night' : '';
-  }, [night]);
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault();
-        document.getElementById('topnav-search')?.focus();
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, []);
-
-  const tabs: [string, string, string][] = [
-    ['/', 'Aprender', 'inicio'],
-    ['/practica', 'Práctica', 'practica'],
-    ['/laboratorio', 'Laboratorio', 'labs'],
-    ['/cheatsheets', 'Chuletas', 'cheatsheets']
-  ];
-  const activeTab = (key: string) =>
-    key === 'inicio' ? (route.name === 'home' || route.name === 'track' || route.name === 'module' || route.name === 'lesson')
-      : key === 'practica' ? route.name === 'practice' || route.name === 'projects'
-      : key === 'labs' ? route.name === 'labs' || route.name === 'lab'
-      : route.name === key;
 
   return <div className="app-shell">
-    <header className="topnav">
-      <button className="menu-btn" onClick={() => setOpen(o => !o)} aria-label="Abrir menú">☰</button>
-      <a className="topnav-logo" href={href('/')}><span>⌬</span><span className="topnav-brand">Academia</span></a>
-      <nav className="topnav-tabs">
-        {tabs.map(([path, label, key]) => <a key={path} className={`topnav-tab ${activeTab(key) ? 'active' : ''}`} href={href(path)}>{label}</a>)}
-      </nav>
-      <div className="topnav-spacer" />
-      <div className="topnav-search" id="topnav-search-wrap">
-        <span>⌕</span>
-        <input id="topnav-search" value={query} placeholder="Buscar lecciones y temas…" onChange={e => setQuery(e.target.value)}
-          onKeyDown={e => { if (e.key === 'Enter' && query.trim()) { go(`/search/${encodeURIComponent(query.trim())}`); setQuery(''); } }} />
-        <kbd>⌘K</kbd>
-      </div>
-      {!online && <span className="offline-chip">offline</span>}
-      {needRefresh && <button className="btn-update" onClick={() => void updateServiceWorker(true)}>Actualizar</button>}
-      <a className="topnav-pill" href={href('/notes')}>✎ Mis notas</a>
-      <button className="topnav-icon" onClick={() => setNight(n => !n)} aria-label="Cambiar tema">{night ? '☀' : '☾'}</button>
-      <a className="topnav-pill avatar" href={href('/notes')} title="Mi progreso">AC</a>
-    </header>
-
     <aside className={`sidebar-wrap ${open ? 'open' : ''}`}><Sidebar onNavigate={() => setOpen(false)} /></aside>
     {open && <div className="scrim" onClick={() => setOpen(false)} />}
     <div className="main-wrap">
+      <header className="topbar">
+        <button className="menu-btn" onClick={() => setOpen(o => !o)} aria-label="Abrir menú">☰</button>
+        <button className="top-title" onClick={() => go('/')}>Academia <span>Robótica & AI Engineer</span></button>
+        <div className="topbar-right">
+          {!online && <span className="offline-chip">sin conexión · modo offline</span>}
+          {needRefresh && <button className="btn-update" onClick={() => void updateServiceWorker(true)}>Hay una versión nueva · actualizar</button>}
+          <a className="icon-btn" href={href('/search')} aria-label="Buscar">⌕</a>
+          <a className="icon-btn" href={href('/notes')} aria-label="Mis notas">✎</a>
+        </div>
+      </header>
       <main className="main-content">{children}</main>
-      <footer className="footer">Academia de Robótica & AI Engineer · funciona sin conexión · papel, tinta y método</footer>
+      <footer className="footer">Academia de Robótica & AI Engineer · Contenido original en español · Funciona sin conexión</footer>
     </div>
   </div>;
 }

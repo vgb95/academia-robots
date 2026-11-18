@@ -1,0 +1,418 @@
+/* ==========================================================================
+   Componentes nuevos — extensión editorial
+   Práctica, galería de esquemas, hoja de ruta, plan de estudio, guía offline,
+   atajos de teclado e ilustración del hero.
+
+   Usa exclusivamente los tokens de styles.css: papel claro, tinta oscura,
+   serif para titulares, sans para cuerpo, mono para etiquetas, líneas
+   hairline, sombras suaves y acentos óxido/violeta. Sin crema, sin
+   JetBrains Mono global y sin sombras duras.
+   ========================================================================== */
+
+/* ---------- Práctica ---------- */
+.practice-page { max-width: 1120px; }
+
+.sheet,
+.practice-card {
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: clamp(18px, 2.4vw, 28px);
+  color: var(--ink);
+  box-shadow: 0 1px 2px rgba(23, 25, 29, .04);
+}
+
+.sheet-head,
+.practice-head {
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 16px;
+}
+.practice-head {
+  border-left: 3px solid var(--accent);
+  border-bottom: 0;
+  padding: 4px 0 4px 20px;
+}
+
+.sheet-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.sheet-eyebrow::before {
+  content: '';
+  width: 26px;
+  height: 1px;
+  flex: 0 0 26px;
+  background: var(--accent);
+}
+
+.sheet-title {
+  margin: 12px 0 6px;
+  font-family: var(--font-serif);
+  font-size: clamp(23px, 3vw, 30px);
+  font-weight: 600;
+  letter-spacing: -.035em;
+  line-height: 1.15;
+  color: var(--ink);
+}
+.sheet-subtitle {
+  max-width: 70ch;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.sheet-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.practice-stats { margin: 14px 0 20px; }
+.practice-filters {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.practice-filters select {
+  min-height: 44px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--ink);
+  padding: 0 12px;
+  font-size: 13px;
+}
+.practice-progress {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .06em;
+  font-variant-numeric: tabular-nums;
+  color: var(--green);
+  margin-top: 10px;
+}
+.practice-summary {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+/* ---------- Galería de esquemas ---------- */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+  gap: 12px;
+}
+.gallery-card {
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 15px;
+  color: var(--ink);
+  transition: border-color .18s ease, transform .18s ease;
+}
+.gallery-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  text-decoration: none;
+  color: var(--ink);
+}
+.gallery-card h3 {
+  margin: 11px 0 5px;
+  font-family: var(--font-serif);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -.02em;
+  line-height: 1.35;
+}
+.gallery-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.gallery-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(23, 25, 29, .5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.gallery-modal-panel {
+  width: 100%;
+  max-width: 980px;
+  max-height: 90vh;
+  overflow: auto;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 18px;
+  box-shadow: 0 18px 48px rgba(23, 25, 29, .12);
+}
+.gallery-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.gallery-modal-head h3 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -.035em;
+}
+
+/* El modal de DiagramGallery lleva estilos en línea heredados del sketchbook;
+   se reconducen al sistema editorial sin tocar el TSX. */
+[role="presentation"][style*="position: fixed"] {
+  background: rgba(23, 25, 29, .5) !important;
+}
+[role="dialog"][style*="--card"] {
+  background: var(--paper-2) !important;
+  border: 1px solid var(--line) !important;
+  box-shadow: 0 18px 48px rgba(23, 25, 29, .12) !important;
+}
+
+/* ---------- Hoja de ruta ---------- */
+.roadmap-section {
+  margin-bottom: 36px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+.roadmap-track {
+  display: grid;
+  gap: 12px;
+  border-left: 2px solid var(--accent);
+  padding-left: 20px;
+  margin-left: 8px;
+}
+.roadmap-line {
+  width: 2px;
+  background: var(--accent);
+  opacity: .35;
+  border-radius: 1px;
+}
+.roadmap-item {
+  display: flex;
+  gap: 18px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 18px 20px;
+  color: var(--ink);
+  box-shadow: 0 1px 2px rgba(23, 25, 29, .04);
+  transition: border-color .18s ease, transform .18s ease;
+}
+.roadmap-item:hover {
+  text-decoration: none;
+  color: var(--ink);
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+.roadmap-num {
+  font-family: var(--font-serif);
+  font-size: 30px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -.04em;
+  color: var(--faint);
+  min-width: 44px;
+}
+.roadmap-body { flex: 1; min-width: 0; }
+.roadmap-body h3 {
+  margin: 0 0 3px;
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -.035em;
+}
+.roadmap-body p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* ---------- Plan de estudio ---------- */
+.studyplan-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.studyplan-controls select {
+  min-height: 44px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--ink);
+  padding: 0 12px;
+  font-size: 13px;
+}
+.studyplan-week {
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  border-radius: 4px;
+  padding: 16px 20px;
+  margin: 12px 0;
+  box-shadow: 0 1px 2px rgba(23, 25, 29, .04);
+}
+.studyplan-week .callout-title {
+  margin-bottom: 0;
+  color: var(--accent);
+}
+
+/* ---------- Guía offline / iPad ---------- */
+.offline-steps,
+.step-track {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 18px 0 24px;
+}
+.offline-steps > div,
+.step-track > div {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.step-dot {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  border: 1px solid var(--line);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.step-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ---------- Atajos de teclado ---------- */
+.shortcuts-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  background: rgba(23, 25, 29, .5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.shortcuts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 16px;
+  margin: 14px 0;
+}
+.shortcut-key {
+  display: inline-block;
+  padding: 4px 8px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* ---------- Ilustración del hero ---------- */
+.hero-art {
+  margin-top: 24px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  max-width: 760px;
+  background: var(--paper-2);
+}
+.hero-art svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* El SVG trae colores del sketchbook como atributos de presentación; CSS
+   gana sobre ellos y los devuelve a la paleta editorial sin editar el TSX. */
+.hero-art svg [fill="#f4ebe0"] { fill: var(--paper); }
+.hero-art svg [fill="#1d1b18"] { fill: var(--ink); }
+.hero-art svg [fill="#46413b"] { fill: var(--ink-2); }
+.hero-art svg [stroke="#1d1b18"] { stroke: var(--ink); }
+.hero-art svg [stroke="#c6bbac"] { stroke: var(--line); }
+.hero-art svg [fill="#fcdcbd"] { fill: var(--robot-soft); }
+.hero-art svg [fill="#e7ddf5"] { fill: var(--ai-soft); }
+.hero-art svg [fill="#dff0de"],
+.hero-art svg [fill="#cfe3b2"] { fill: #EFF6F1; }
+.hero-art svg [stroke="#a99bbd"] { stroke: var(--ai); }
+.hero-art svg [stroke="#7fbfa8"] { stroke: var(--green); }
+.hero-art svg text { font-family: var(--font-mono); }
+
+/* ---------- Adaptación ---------- */
+@media (max-width: 880px) {
+  .practice-page { max-width: 100%; }
+  .gallery-grid { grid-template-columns: 1fr; }
+  .shortcuts-grid { grid-template-columns: 1fr; }
+  .roadmap-item { flex-wrap: wrap; }
+  .roadmap-track { padding-left: 14px; margin-left: 4px; }
+  .gallery-modal,
+  .shortcuts-overlay { padding: 12px; }
+  .gallery-modal-panel { max-height: 92vh; padding: 14px; }
+
+  /* Controles táctiles: nunca por debajo de 44 px. */
+  .practice-filters select,
+  .studyplan-controls select,
+  .studyplan-controls .btn,
+  .sheet-actions .btn,
+  .gallery-card .btn,
+  .sheet .btn {
+    min-height: 44px;
+  }
+  .step-dot { width: 44px; height: 44px; flex-basis: 44px; }
+}
+
+@media (max-width: 520px) {
+  .sheet { padding: 18px 16px; }
+  .studyplan-week { padding: 14px 16px; }
+  .sheet-actions .btn,
+  .studyplan-controls .btn,
+  .practice-filters select,
+  .studyplan-controls select {
+    flex: 1 1 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery-card,
+  .roadmap-item { transition: none; }
+}

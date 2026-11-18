@@ -29,7 +29,7 @@ function LabScene({ lab, active }: { lab: Lab; active: string[] }) {
       return <g key={i}>
         <path d={`M${a.x} ${a.y} L${b.x} ${b.y}`} fill="none" stroke={lit ? '#7fc278' : '#bdb4a8'} strokeWidth={lit ? 2.4 : 1.3}
           strokeDasharray={lit ? undefined : '4 5'} markerEnd="url(#labArrow)" opacity={lit ? 1 : 0.7} />
-        {e.label && lit && <text x={(a.x + b.x) / 2} y={(a.y + b.y) / 2 - 9} textAnchor="middle" fill="#34302b" fontSize="11" fontFamily="JetBrains Mono, monospace">{e.label}</text>}
+        {e.label && lit && <text x={(a.x + b.x) / 2} y={(a.y + b.y) / 2 - 9} textAnchor="middle" fill="#34302b" fontSize="11" fontFamily="system-ui, -apple-system, sans-serif">{e.label}</text>}
       </g>;
     })}
     {lab.nodes.map(n => {
@@ -37,8 +37,8 @@ function LabScene({ lab, active }: { lab: Lab; active: string[] }) {
       const w = n.w ?? Math.max(104, n.label.length * 9 + 34);
       return <g key={n.id} transform={`translate(${n.x - w / 2},${n.y - 23})`}>
         <rect x="3" y="3" width={w} height="46" rx="8" fill="#46413b" opacity={isActive ? 0.9 : 0.32} />
-        <rect width={w} height="46" rx="8" fill={toneFill[n.tone ?? 'plain']} stroke={isActive ? '#1d1b18' : toneStroke[n.tone ?? 'plain']} strokeWidth={isActive ? 2 : 1.2} />
-        <text x={w / 2} y="29" textAnchor="middle" fill="#1d1b18" fontSize="14" fontWeight={isActive ? 700 : 500} fontFamily="JetBrains Mono, monospace">{n.label}</text>
+        <rect width={w} height="46" rx="8" fill={toneFill[n.tone ?? 'plain']} stroke={isActive ? '#17191D' : toneStroke[n.tone ?? 'plain']} strokeWidth={isActive ? 2 : 1.2} />
+        <text x={w / 2} y="29" textAnchor="middle" fill="#17191D" fontSize="14" fontWeight={isActive ? 700 : 500} fontFamily="system-ui, -apple-system, sans-serif">{n.label}</text>
       </g>;
     })}
   </svg>;
