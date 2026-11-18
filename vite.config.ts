@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+  base: '/academia-robots/',
   build: {
     rollupOptions: {
       output: {
@@ -26,8 +27,8 @@ export default defineConfig({
         short_name: 'Academia',
         description: 'Roadmap interactivo y offline para aprender robótica desde cero e ingeniería de IA.',
         lang: 'es',
-        start_url: '/',
-        scope: '/',
+        start_url: '/academia-robots/',
+        scope: '/academia-robots/',
         display: 'standalone',
         orientation: 'any',
         background_color: '#0b1020',
@@ -41,7 +42,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2,json}'],
-        navigateFallback: '/index.html',
+        navigateFallback: '/academia-robots/index.html',
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: false,
