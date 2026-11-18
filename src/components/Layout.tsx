@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
-import { tracks } from '../data/tracks';
+import { tracks, findLesson } from '../data/tracks';
 import { useStore } from '../state/store';
 import { href, go, useRoute } from '../router';
 
@@ -29,11 +29,11 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
     </>}
     <div className="sidebar-section-title">HERRAMIENTAS</div>
     {[
-      ['/library', '📚', 'Biblioteca'], ['/projects', '🛠️', 'Proyectos'],
-      ['/glossary', '📖', 'Glosario'], ['/kit', '🔧', 'Banco y BOM'],
-      ['/cases', '🦾', 'Casos reales'], ['/flashcards', '🃏', 'Flashcards'],
-      ['/troubleshooting', '🔧', 'Diagnóstico'], ['/cheatsheets', '📋', 'Chuletas'],
-      ['/notes', '✍️', 'Mis notas'], ['/search', '🔎', 'Buscar']
+      ['/library', '§', 'Biblioteca'], ['/projects', '⚒', 'Proyectos'],
+      ['/glossary', '¶', 'Glosario'], ['/kit', '⌗', 'Banco y BOM'],
+      ['/cases', '⛭', 'Casos reales'], ['/flashcards', '◫', 'Flashcards'],
+      ['/troubleshooting', '⚕', 'Diagnóstico'], ['/cheatsheets', '≡', 'Chuletas'],
+      ['/notes', '✎', 'Mis notas'], ['/search', '⌕', 'Buscar']
     ].map(([path, icon, label]) => <a key={path} className="side-link" href={href(path)}><span className="side-icon">{icon}</span><span>{label}</span></a>)}
     <div className="sidebar-foot">Hecho para aprenderse a fondo.<br />Offline, en tu iPad.</div>
   </nav>;
@@ -51,6 +51,12 @@ export function Layout({ children }: { children: ReactNode }) {
     return () => { window.removeEventListener('online', on); window.removeEventListener('offline', off); };
   }, []);
   useEffect(() => { setOpen(false); }, [route]);
+  useEffect(() => {
+    let t = '';
+    if (route.name === 'track' || route.name === 'module') t = route.track;
+    else if (route.name === 'lesson') t = findLesson(route.id)?.track.id ?? '';
+    document.documentElement.dataset.track = t;
+  }, [route]);
 
   return <div className="app-shell">
     <aside className={`sidebar-wrap ${open ? 'open' : ''}`}><Sidebar onNavigate={() => setOpen(false)} /></aside>
@@ -62,8 +68,8 @@ export function Layout({ children }: { children: ReactNode }) {
         <div className="topbar-right">
           {!online && <span className="offline-chip">sin conexión · modo offline</span>}
           {needRefresh && <button className="btn-update" onClick={() => void updateServiceWorker(true)}>Hay una versión nueva · actualizar</button>}
-          <a className="icon-btn" href={href('/search')} aria-label="Buscar">🔎</a>
-          <a className="icon-btn" href={href('/notes')} aria-label="Mis notas">✍️</a>
+          <a className="icon-btn" href={href('/search')} aria-label="Buscar">⌕</a>
+          <a className="icon-btn" href={href('/notes')} aria-label="Mis notas">✎</a>
         </div>
       </header>
       <main className="main-content">{children}</main>

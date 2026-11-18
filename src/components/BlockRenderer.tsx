@@ -11,13 +11,27 @@ const termRe = escaped.length ? new RegExp(`\\b(${escaped.join('|')})\\b`, 'gi')
 const termMap = new Map(terms.map(t => [t.term.toLowerCase(), t]));
 
 // Resaltado de términos del glosario, sin HTML inseguro.
-export function RichText({ text }: { text: string }): ReactNode {
+function highlightTerms(text: string): ReactNode {
   if (!termRe) return <>{text}</>;
   const parts = text.split(termRe);
   return <>{parts.map((part, i) => {
     const entry = termMap.get(part.toLowerCase());
     if (!entry) return <Fragment key={i}>{part}</Fragment>;
     return <abbr className="gloss-term" key={i} title={`${entry.short}\n\n${entry.long}`}>{part}</abbr>;
+  })}</>;
+}
+
+// Negrita / cursiva / código en línea con Markdown mínimo.
+const inlineRe = /(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g;
+export function RichText({ text }: { text: string }): ReactNode {
+  return <>{text.split(inlineRe).map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**') && part.length > 4)
+      return <strong key={i}>{highlightTerms(part.slice(2, -2))}</strong>;
+    if (part.startsWith('*') && part.endsWith('*') && part.length > 2)
+      return <em key={i}>{highlightTerms(part.slice(1, -1))}</em>;
+    if (part.startsWith('`') && part.endsWith('`') && part.length > 2)
+      return <code className="inline-code" key={i}>{part.slice(1, -1)}</code>;
+    return <Fragment key={i}>{highlightTerms(part)}</Fragment>;
   })}</>;
 }
 

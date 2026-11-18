@@ -76,16 +76,16 @@ export function PwmWidget() {
       <Field label="Frecuencia" value={freq} onChange={setFreq} step="100" unit="Hz" />
     </div>
     <svg viewBox="0 0 600 130" className="pwm-svg" role="img" aria-label="Forma de onda PWM">
-      <rect width="600" height="130" fill="#0d1426" rx="8" />
-      <line x1="20" y1="100" x2="580" y2="100" stroke="#3b4b70" />
-      <line x1="20" y1="30" x2="580" y2="30" stroke="#243252" strokeDasharray="4 4" />
+      <rect width="600" height="130" fill="#15181C" rx="8" />
+      <line x1="20" y1="100" x2="580" y2="100" stroke="#3A414C" />
+      <line x1="20" y1="30" x2="580" y2="30" stroke="#3A414C" strokeDasharray="4 4" />
       {[0, 1, 2, 3].map(i => {
         const x = 20 + i * 140;
         const on = 140 * duty / 100;
-        return <polyline key={i} points={`${x},100 ${x},30 ${x + on},30 ${x + on},100 ${x + 140},100`} fill="none" stroke="#7dd3fc" strokeWidth="3" />;
+        return <polyline key={i} points={`${x},100 ${x},30 ${x + on},30 ${x + on},100 ${x + 140},100`} fill="none" stroke="#7FD1C1" strokeWidth="3" />;
       })}
-      <text x="30" y="122" fill="#93a4c8" fontSize="11">0 V</text>
-      <text x="540" y="122" fill="#93a4c8" fontSize="11">t →</text>
+      <text x="30" y="122" fill="#A2A8B2" fontSize="11">0 V</text>
+      <text x="540" y="122" fill="#A2A8B2" fontSize="11">t →</text>
     </svg>
     <div className="results">
       <Result label="Tensión media (5 V)" value={`${(5 * duty / 100).toFixed(2)} V`} />
@@ -134,12 +134,12 @@ export function PidWidget() {
       <Field label="Kd" value={kd} onChange={setKd} step="0.05" />
     </div>
     <svg viewBox="0 0 760 280" className="pwm-svg" role="img" aria-label="Respuesta al escalón del lazo PID">
-      <rect width="760" height="280" fill="#0d1426" rx="8" />
-      <line x1="60" y1="230" x2="720" y2="230" stroke="#3b4b70" />
-      <line x1="60" y1="60" x2="60" y2="230" stroke="#3b4b70" />
-      <line x1="60" y1="60" x2="720" y2="60" stroke="#ffbe5a" strokeDasharray="5 5" />
-      <polyline points={pts} fill="none" stroke="#7dd3fc" strokeWidth="2.5" />
-      <text x="670" y="52" fill="#ffbe5a" fontSize="11">setpoint</text>
+      <rect width="760" height="280" fill="#15181C" rx="8" />
+      <line x1="60" y1="230" x2="720" y2="230" stroke="#3A414C" />
+      <line x1="60" y1="60" x2="60" y2="230" stroke="#3A414C" />
+      <line x1="60" y1="60" x2="720" y2="60" stroke="#F5C16C" strokeDasharray="5 5" />
+      <polyline points={pts} fill="none" stroke="#7FD1C1" strokeWidth="2.5" />
+      <text x="670" y="52" fill="#F2F1ED" fontSize="11">setpoint</text>
     </svg>
     <p className="widget-hint">Sube Kp → más rápido pero oscila. Sube Kd → amortigua. Sube Ki → elimina error steady-state pero puede causar windup.</p>
   </Card>;

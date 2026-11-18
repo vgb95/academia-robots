@@ -19,7 +19,7 @@ export function CasesPage() {
   const cats = [...new Set(cases.map(c => c.category))];
   const list = cases.filter(c => (cat === 'all' || c.category === cat) && (q === '' || (c.name + c.summary + c.lesson + c.sensors.join(' ')).toLowerCase().includes(q.toLowerCase())));
   return <div className="page">
-    <PageHead crumb="Casos reales" title="🤖 Anatomía de robots reales" desc={`${cases.length} sistemas reales desmontados capa por capa. La pregunta importante no es qué hace cada robot, sino qué lección técnica te deja a ti.`} />
+    <PageHead crumb="Casos reales" title="⛭ Anatomía de robots reales" desc={`${cases.length} sistemas reales desmontados capa por capa. La pregunta importante no es qué hace cada robot, sino qué lección técnica te deja a ti.`} />
     <div className="filters">
       <input className="search-input" placeholder="Buscar robot o empresa…" value={q} onChange={e => setQ(e.target.value)} />
       <select value={cat} onChange={e => setCat(e.target.value)}><option value="all">Todas las categorías</option>{cats.map(c => <option key={c} value={c}>{c}</option>)}</select>
@@ -37,8 +37,8 @@ export function CasesPage() {
           <div><strong>Control</strong><span>{c.control}</span></div>
           <div><strong>Aprendizaje</strong><span>{c.learning}</span></div>
         </div>
-        <div className="case-lesson"><strong>💡 Lección para ti</strong><p>{c.lesson}</p></div>
-        <div className="case-links">{c.resources.map((r, i) => <a key={i} href={r.url} target="_blank" rel="noreferrer">🔗 {r.label} ↗</a>)}</div>
+        <div className="case-lesson"><strong>▸ Lección para ti</strong><p>{c.lesson}</p></div>
+        <div className="case-links">{c.resources.map((r, i) => <a key={i} href={r.url} target="_blank" rel="noreferrer">↗ {r.label}</a>)}</div>
       </div>
     </details>)}</div>
   </div>;
@@ -62,11 +62,11 @@ export function FlashcardsPage() {
   const next = () => { setIdx(i => (i + 1) % Math.max(1, list.length)); setFlipped(false); };
   const prev = () => { setIdx(i => (i - 1 + Math.max(1, list.length)) % Math.max(1, list.length)); setFlipped(false); };
   return <div className="page">
-    <PageHead crumb="Flashcards" title="🃏 Repetición espaciada" desc={`${flashcards.length} tarjetas para repasar conceptos en cualquier momento. Date la vuelta a la tarjeta, juzga si la sabías y sigue. Tu progreso se guarda en el dispositivo.`} />
+    <PageHead crumb="Flashcards" title="◫ Repetición espaciada" desc={`${flashcards.length} tarjetas para repasar conceptos en cualquier momento. Date la vuelta a la tarjeta, juzga si la sabías y sigue. Tu progreso se guarda en el dispositivo.`} />
     <div className="filters">
       <select value={track} onChange={e => { setTrack(e.target.value); setIdx(0); setFlipped(false); }}><option value="all">Todos los tracks</option><option value="robotica">Robótica</option><option value="ai">AI Engineer</option><option value="ambos">Ambos</option></select>
       <select value={moduleFilter} onChange={e => { setModuleFilter(e.target.value); setIdx(0); setFlipped(false); }}><option value="all">Todos los módulos</option>{modules.map(m => <option key={m} value={m}>{m}</option>)}</select>
-      <button className="btn btn-ghost" onClick={() => { setShuffle(s => !s); setIdx(0); setFlipped(false); }}>{shuffle ? '🔀 Orden aleatorio' : '↔ Orden original'}</button>
+      <button className="btn btn-ghost" onClick={() => { setShuffle(s => !s); setIdx(0); setFlipped(false); }}>{shuffle ? '⇌ Orden aleatorio' : '↔ Orden original'}</button>
       <span className="count">{knownCount} / {list.length} sabidas</span>
     </div>
     {card ? <div className="flashcard-wrap">
@@ -98,7 +98,7 @@ export function TroubleshootingPage() {
   const [track, setTrack] = useState('all');
   const list = troubleshooting.filter(t => (track === 'all' || t.track === track) && (q === '' || (t.symptom + t.category + t.causes.map(c => c.cause + c.check + c.fix).join(' ')).toLowerCase().includes(q.toLowerCase())));
   return <div className="page">
-    <PageHead crumb="Troubleshooting" title="🔧 Diagnóstico de fallos" desc={`${troubleshooting.length} síntomas reales con causas probables, qué comprobar y cómo arreglarlo. Cuando algo no funcione, empieza por aquí antes de buscar en internet.`} />
+    <PageHead crumb="Troubleshooting" title="⚕ Diagnóstico de fallos" desc={`${troubleshooting.length} síntomas reales con causas probables, qué comprobar y cómo arreglarlo. Cuando algo no funcione, empieza por aquí antes de buscar en internet.`} />
     <div className="filters">
       <input className="search-input" placeholder="Describe el síntoma: motor no gira, loss no baja…" value={q} onChange={e => setQ(e.target.value)} />
       <select value={track} onChange={e => setTrack(e.target.value)}><option value="all">Ambos tracks</option><option value="robotica">Robótica</option><option value="ai">AI Engineer</option></select>
@@ -120,7 +120,7 @@ export function CheatsheetsPage() {
   const [track, setTrack] = useState('all');
   const list = cheatsheets.filter(c => (track === 'all' || c.track === track || c.track === 'ambos') && (q === '' || (c.title + c.description + c.groups.map(g => g.title + g.items.map(i => i.term + i.value + (i.note ?? '')).join(' ')).join(' ')).toLowerCase().includes(q.toLowerCase())));
   return <div className="page">
-    <PageHead crumb="Chuleta" title="📋 Hojas de referencia rápida" desc={`${cheatsheets.length} hojas con comandos, fórmulas y snippets que necesitarás una y otra vez. Úsalas como reference, no como sustituto de las lecciones.`} />
+    <PageHead crumb="Chuleta" title="≡ Hojas de referencia rápida" desc={`${cheatsheets.length} hojas con comandos, fórmulas y snippets que necesitarás una y otra vez. Úsalas como reference, no como sustituto de las lecciones.`} />
     <div className="filters">
       <input className="search-input" placeholder="Buscar fórmula o comando…" value={q} onChange={e => setQ(e.target.value)} />
       <select value={track} onChange={e => setTrack(e.target.value)}><option value="all">Todos los tracks</option><option value="robotica">Robótica</option><option value="ai">AI Engineer</option></select>

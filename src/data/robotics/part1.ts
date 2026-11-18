@@ -71,7 +71,7 @@ M('b0', 'Orientación y supervivencia', 'Por qué robótica, qué es el trabajo 
       objectives: ['Definir V, I y R con analogías correctas', 'Calcular corriente en circuitos simples'],
       blocks: [
         p('Piensa en un circuito como en agua por una tubería. El **voltaje** es la presión, la **corriente** es el caudal y la **resistencia** es lo estrecha que es la tubería.'),
-        formula('V = I · R        I = V / R        R = V / I', 'V en voltios (V), I en amperios (A), R en ohmios (Ω).'),
+        formula('V = I · R   |   I = V / R   |   R = V / I', 'V en voltios (V), I en amperios (A), R en ohmios (Ω).'),
         diagrama('ley_ohm', 'El triángulo de Ohm: tapa lo que buscas y lee la operación.'),
         p('Ejemplo: un LED con Vf ≈ 2 V alimentado desde 5 V y con una resistencia de 330 Ω. La corriente es (5−2)/330 ≈ 9 mA. Suficiente para brillar, seguro para el pin.'),
         widget('ohm'),

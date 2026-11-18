@@ -10,8 +10,8 @@ export const tracks: Track[] = [
     title: 'Robótica desde cero',
     tagline: 'De la ley de Ohm al robot que aprende',
     description: '12 bloques para construir la base completa: electrónica, microcontroladores, motores, sensores, fabricación, ROS 2, control, visión y robot learning. Pensado para alguien que nunca ha sostenido un multímetro.',
-    icon: '🤖',
-    accent: '#7dd3fc',
+    icon: '⌬',
+    accent: '#C4471E',
     modules: [...roboticsPart1, ...roboticsPart2, ...roboticsPart3]
   },
   {
@@ -19,8 +19,8 @@ export const tracks: Track[] = [
     title: 'AI Engineer',
     tagline: 'Para SWE que quieren pasar a IA',
     description: '11 bloques que asumen que ya sabes programar: fundamentos de ML, deep learning, LLMs, RAG, agentes, inferencia, evals y MLOps. Lenguaje técnico claro, cero relleno.',
-    icon: '🧠',
-    accent: '#c4a7ff',
+    icon: '◈',
+    accent: '#5B3FD6',
     modules: aiModules
   }
 ];
