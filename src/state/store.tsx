@@ -67,21 +67,32 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     return () => { alive = false; };
   }, []);
 
+  // Firma de los datos que se persisten, sin incluir updatedAt. El efecto de
+  // grabado depende de ella (no de state completo) para que reflejar la marca
+  // de tiempo en el estado no dispare otra grabación en bucle.
+  const contentKey = JSON.stringify([
+    state.progress, state.checks, state.quiz, state.notes, state.bookmarks, state.lastLesson
+  ]);
+
   // Persistencia automática: IndexedDB con fallback a localStorage.
   useEffect(() => {
     if (firstRun.current) { firstRun.current = false; return; }
     if (!ready) return;
     const t = window.setTimeout(async () => {
-      const withTime = { ...state, updatedAt: Date.now() };
+      const now = Date.now();
+      const withTime: AppState = { ...state, updatedAt: now };
       try {
         const db = await getDB();
         await db.put(STORE, withTime, KEY);
       } catch {
         try { localStorage.setItem('academia-robots-fallback', JSON.stringify(withTime)); } catch { /* ignore */ }
       }
+      // Refleja la marca en el estado para que «Último guardado» esté al día.
+      // El efecto no se repite: depende de contentKey, que excluye updatedAt.
+      setState(s => s.updatedAt === now ? s : { ...s, updatedAt: now });
     }, 250);
     return () => window.clearTimeout(t);
-  }, [state, ready]);
+  }, [contentKey, ready]);
 
   const setProgress = useCallback((id: string, value: Progress) => {
     setState(s => ({ ...s, progress: { ...s.progress, [id]: value } }));

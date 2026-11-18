@@ -14,6 +14,13 @@ export type Route =
   | { name: 'flashcards' }
   | { name: 'troubleshooting' }
   | { name: 'cheatsheets' }
+  | { name: 'labs' }
+  | { name: 'lab'; id: string }
+  | { name: 'practice' }
+  | { name: 'diagrams' }
+  | { name: 'roadmap' }
+  | { name: 'studyplan' }
+  | { name: 'offline' }
   | { name: 'search'; q: string }
   | { name: '404' };
 
@@ -35,6 +42,14 @@ function parse(hash: string): Route {
     case 'flashcards': return { name: 'flashcards' };
     case 'troubleshooting': return { name: 'troubleshooting' };
     case 'cheatsheets': return { name: 'cheatsheets' };
+    case 'laboratorio': case 'labs':
+      if (parts[1]) return { name: 'lab', id: parts[1] };
+      return { name: 'labs' };
+    case 'practica': case 'practice': return { name: 'practice' };
+    case 'esquemas': case 'diagrams': return { name: 'diagrams' };
+    case 'ruta': case 'roadmap': return { name: 'roadmap' };
+    case 'plan': case 'studyplan': return { name: 'studyplan' };
+    case 'offline': return { name: 'offline' };
     case 'search': return { name: 'search', q: parts[1] ?? '' };
     default: return { name: '404' };
   }

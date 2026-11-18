@@ -4,6 +4,7 @@ import { resources, projects, glossary, bomTiers, companies } from '../data/shar
 import { useStore } from '../state/store';
 import { href } from '../router';
 import { RichText } from './BlockRenderer';
+import { HeroArt } from './HeroArt';
 
 export function HomePage() {
   const { state } = useStore();
@@ -25,6 +26,7 @@ export function HomePage() {
         <div><strong>{resources.length}</strong><span>recursos</span></div>
       </div>
       {last && <a className="resume" href={href(`/lesson/${last.lesson.id}`)}>Continuar donde lo dejaste: <strong>{last.lesson.title}</strong> →</a>}
+      <div className="hero-art"><HeroArt /></div>
     </section>
 
     <section className="track-cards">

@@ -1513,4 +1513,158 @@ export const cheatsheets: CheatSection[] = [
       },
     ],
   },
+
+  /* =====================================================================
+     22. LABORATORIO DE ROBÓTICA: ESCENARIOS PASO A PASO
+     ===================================================================== */
+  {
+    id: 'laboratorio-robotica',
+    title: 'Laboratorio de robótica: fórmulas y pasos clave',
+    track: 'robotica',
+    description: 'Referencia rápida de los escenarios interactivos: Ohm y RC, PWM de servo, PID, IMU, comandos ROS 2 y tf2/Nav2.',
+    groups: [
+      {
+        title: 'Ohm, RC y PWM',
+        items: [
+          { term: 'Ley de Ohm', value: 'V = I · R', note: 'Base del escenario de LED y divisor: despeja I = V / R antes de montar.' },
+          { term: 'Constante RC', value: 'τ = R · C', note: 'A 1τ el capacitor llega al 63% y a 5τ al 99%; mide el transitorio en Falstad.' },
+          { term: 'Carga de capacitor', value: 'Vc(t) = Vf + (V0 - Vf)·e^(-t/τ)', note: 'V0 es la tensión inicial y Vf la final.' },
+          { term: 'Resistencia de LED', value: 'R = (Vcc - Vf) / If', note: 'If típico de 10 a 20 mA; nunca alimentes el LED sin resistencia.' },
+          { term: 'Duty PWM', value: 'Vmedia = duty · Vbus', note: 'En analogWrite, duty = valor / 255 con resolución de 8 bits.' },
+          { term: 'Servo 50 Hz', value: 'Período 20 ms; pulso 1 ms = 0°, 1.5 ms = 90°, 2 ms = 180°', note: 'El ancho del pulso define el ángulo, no la frecuencia.' },
+          { term: 'Ángulo desde pulso', value: 'ángulo = (pulso_us - 1000) · 180 / 1000', note: 'Ajusta los extremos reales de tu servo para no forzar los topes.' },
+          { term: 'ADC a voltios', value: 'V = lectura · 3.3 / 4095', note: 'En ESP32 el rango útil está cerca de 0.1 a 3.2 V.' },
+        ],
+      },
+      {
+        title: 'Control PID',
+        items: [
+          { term: 'Ecuación discreta', value: 'u[k] = Kp·e[k] + Ki·Ts·Σe[i] + Kd·(e[k]-e[k-1])/Ts', note: 'e[k] = consigna - medición; Ts es el periodo de muestreo.' },
+          { term: 'Kp', value: 'Reduce el error y acelera la respuesta', note: 'Muy alto produce oscilaciones.' },
+          { term: 'Ki', value: 'Elimina el error estacionario', note: 'Muy alto causa sobreimpulso y windup.' },
+          { term: 'Kd', value: 'Aporta amortiguación y anticipa la tendencia', note: 'Amplifica ruido: conviene filtrar la medición.' },
+          { term: 'Anti-windup', value: 'Congela el integrador cuando la salida está saturada', note: 'Evita un gran sobreimpulso tras una saturación larga.' },
+          { term: 'Ziegler-Nichols', value: 'Kp = 0.6·Ku, Ti = Tu/2, Td = Tu/8', note: 'Ku y Tu son la ganancia y el periodo de la oscilación sostenida.' },
+          { term: 'Sobreimpulso', value: 'Mp = (max - final)/final · 100%', note: 'Objetivo típico: menos del 10 al 20%.' },
+          { term: 'Error estacionario', value: 'ess = lím e(t) cuando t → infinito', note: 'Se elimina con un integrador si la planta es estable.' },
+        ],
+      },
+      {
+        title: 'IMU y filtros',
+        items: [
+          { term: 'Integrar giroscopio', value: 'θ += ω · Δt', note: 'El bias produce deriva lineal; calibra en reposo durante 2 a 5 s.' },
+          { term: 'Pitch desde acel', value: 'pitch = atan2(ax, √(ay² + az²))', note: 'Solo válido en reposo o movimiento suave.' },
+          { term: 'Filtro complementario', value: 'θ = α·(θ + ω·Δt) + (1-α)·θacel', note: 'α de 0.95 a 0.98: giro a corto plazo, acel a largo plazo.' },
+          { term: 'Ganancia de Kalman', value: 'K = P·Hᵀ·(H·P·Hᵀ + R)⁻¹', note: 'K crece cuando la medición es fiable.' },
+          { term: 'ToF', value: 'd = c · Δt / 2', note: 'El factor 1/2 es por el camino de ida y vuelta del pulso de luz.' },
+          { term: 'Mediana de 5', value: 'Descarta outliers antes de filtrar', note: 'Un solo punto falso puede arruinar el filtro.' },
+          { term: 'Odometría diferencial', value: 'v = (vr + vl)/2 ; ωz = (vr - vl)/L', note: 'L es la separación entre ruedas.' },
+          { term: 'Millis sin delay', value: 'if (millis() - t0 >= Ts) { t0 = millis(); ... }', note: 'Mantiene el lazo de control respondiendo.' },
+        ],
+      },
+      {
+        title: 'Comandos ROS 2 y grafo',
+        items: [
+          { term: 'Listar nodos', value: 'ros2 node list', note: 'Muestra los nodos activos del grafo.' },
+          { term: 'Info de nodo', value: 'ros2 node info /mi_nodo', note: 'Publicadores, suscriptores, servicios y parámetros.' },
+          { term: 'Grafo visual', value: 'rqt_graph', note: 'Dibuja nodos y topics en tiempo real.' },
+          { term: 'Listar topics', value: 'ros2 topic list -t', note: '-t añade el tipo de mensaje de cada topic.' },
+          { term: 'Frecuencia real', value: 'ros2 topic hz /mi_topic', note: 'Diagnostica caídas de tasa en el lazo.' },
+          { term: 'Publicar', value: 'ros2 topic pub -r 10 /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.2}}"', note: '-r publica de forma continua a 10 Hz.' },
+          { term: 'Echo con campo', value: 'ros2 topic echo /odom --field pose.pose.position', note: 'Filtra un campo concreto del mensaje.' },
+          { term: 'Ver interfaces', value: 'ros2 interface show geometry_msgs/msg/Twist', note: 'Muestra la definición completa del mensaje.' },
+        ],
+      },
+      {
+        title: 'tf2 y Nav2',
+        items: [
+          { term: 'Árbol de marcos', value: 'map → odom → base_link → sensor_link', note: 'Cada marco tiene un solo padre; no puede haber ciclos.' },
+          { term: 'Ver árbol TF', value: 'ros2 run tf2_tools view_frames', note: 'Genera un PDF con el grafo de transformaciones.' },
+          { term: 'Echo de TF', value: 'ros2 run tf2_ros tf2_echo map base_link', note: 'Imprime la transformación entre dos marcos.' },
+          { term: 'TF estático', value: 'ros2 run tf2_ros static_transform_publisher 0 0 0.1 0 0 0 map odom', note: 'Argumentos: x y z yaw pitch roll padre hijo.' },
+          { term: 'Convención de ejes', value: 'X adelante, Y izquierda, Z arriba', note: 'Los frame_id no empiezan por barra en ROS 2.' },
+          { term: 'Arrancar Nav2', value: 'ros2 launch nav2_bringup bringup_launch.py use_sim_time:=true map:=mapa.yaml', note: 'Levanta map server, AMCL, planner y controller.' },
+          { term: 'Enviar objetivo', value: 'ros2 topic pub /goal_pose geometry_msgs/msg/PoseStamped "{...}"', note: 'El destino debe caer en una celda libre del costmap.' },
+          { term: 'Robot parado', value: 'ros2 topic echo /behavior_tree_log', note: 'El árbol de comportamiento explica el bloqueo.' },
+        ],
+      },
+    ],
+  },
+
+  /* =====================================================================
+     23. LABORATORIO DE IA: ESCENARIOS PASO A PASO
+     ===================================================================== */
+  {
+    id: 'laboratorio-ai',
+    title: 'Laboratorio de IA: fórmulas y pasos clave',
+    track: 'ai',
+    description: 'Referencia rápida de los escenarios de IA: atención, retropropagación, caché KV, inferencia y evaluación de modelos.',
+    groups: [
+      {
+        title: 'Atención y transformers',
+        items: [
+          { term: 'Producto punto escalado', value: 'Attention(Q,K,V) = softmax(Q·Kᵀ / √d_k)·V', note: '√d_k evita que los logits crezcan y saturen el softmax.' },
+          { term: 'Formas de Q, K, V', value: 'Q,K,V ∈ R^(n · d_model); Q·Kᵀ ∈ R^(n · n)', note: 'n es la longitud de la secuencia.' },
+          { term: 'Multi-head', value: 'head_i = Attention(Q·WQi, K·WKi, V·WVi)', note: 'Se concatenan los cabezales y se proyecta con Wᴼ.' },
+          { term: 'Codificación posicional', value: 'PE(pos,2i) = sen(pos / 10000^(2i/d))', note: 'Aporta orden sin recurrencia.' },
+          { term: 'Máscara causal', value: 'softmax se aplica solo a posiciones ≤ i', note: 'Impide que el token vea el futuro al generar.' },
+          { term: 'Residual + LayerNorm', value: 'x = LayerNorm(x + Subcapa(x))', note: 'Estabiliza el entrenamiento de redes profundas.' },
+          { term: 'Temperatura', value: 'softmax(logits / T)', note: 'T bajo es más determinista; T alto, más creativo.' },
+          { term: 'top_p', value: 'Conserva el conjunto mínimo de tokens con probabilidad acumulada p', note: '0.9 es un valor típico.' },
+        ],
+      },
+      {
+        title: 'Backprop y entrenamiento',
+        items: [
+          { term: 'Regla de la cadena', value: '∂L/∂x = (∂L/∂y)·(∂y/∂x)', note: 'El grafo de autograd aplica esto capa por capa.' },
+          { term: 'Gradiente de pesos', value: '∂L/∂W = xᵀ · δ', note: 'δ es el gradiente de la salida de la capa.' },
+          { term: 'Pérdida', value: 'L = -Σ y_i · log(ŷ_i)', note: 'Entropía cruzada para clasificación multiclass.' },
+          { term: 'Paso SGD', value: 'W ← W - lr · ∂L/∂W', note: 'El learning rate controla el tamaño del paso.' },
+          { term: 'AdamW', value: 'momento + decaimiento de pesos desacoplado', note: 'Default práctico en transformers.' },
+          { term: 'Clip de gradiente', value: 'clip_grad_norm_(params, 1.0)', note: 'Evita explosión de gradientes.' },
+          { term: 'Ciclo de entrenamiento', value: 'zero_grad → forward → loss → backward → step', note: 'Olvidar zero_grad acumula gradientes de más.' },
+          { term: 'Overfitting', value: 'Compara pérdida de entrenamiento y validación', note: 'Early stopping cuando la validación deja de bajar.' },
+        ],
+      },
+      {
+        title: 'Caché KV e inferencia',
+        items: [
+          { term: 'Qué guarda', value: 'K y V de todas las capas y tokens ya procesados', note: 'Evita recalcular el prefijo en cada paso de decodificación.' },
+          { term: 'Forma de la caché', value: '[n_capas, n_tokens, n_cabezales, d_k] × 2 (K y V)', note: 'Crece linealmente con el contexto.' },
+          { term: 'Memoria aprox.', value: '2 · n_capas · L · d_model · bytes_por_valor', note: 'Con fp16 son 2 bytes; multiplica por lote y secuencia.' },
+          { term: 'Sin caché', value: 'Coste por token ∝ L²', note: 'Recalcular todo el prefijo es la comparación del escenario.' },
+          { term: 'Con caché', value: 'Coste por token ∝ L', note: 'Solo se procesa el token nuevo.' },
+          { term: 'TTFT', value: 'Tiempo hasta el primer token', note: 'Mide la percepción de rapidez.' },
+          { term: 'Throughput', value: 'tokens generados / segundo', note: 'Mide el rendimiento sostenido.' },
+          { term: 'Batching continuo', value: 'Agrupa peticiones en curso en cada paso', note: 'Multiplica el throughput frente a una petición a la vez.' },
+        ],
+      },
+      {
+        title: 'Evaluación de LLMs',
+        items: [
+          { term: 'División justa', value: 'train / valid / test con semilla fija', note: 'Nunca ajustes hiperparámetros sobre el test.' },
+          { term: 'Exact match', value: 'pred == referencia', note: 'Métrica estricta; útil cuando hay una sola respuesta correcta.' },
+          { term: 'F1', value: '2·P·R / (P + R)', note: 'Une precisión y recall en tareas de extracción.' },
+          { term: 'Perplejidad', value: 'PPL = exp(pérdida media por token)', note: 'Más bajo es mejor; compara solo modelos con el mismo tokenizer.' },
+          { term: 'ROUGE / BLEU', value: 'Solapamiento de n-gramas con la referencia', note: 'Rápido, pero no mide semántica.' },
+          { term: 'Juez LLM', value: 'Otro modelo puntúa con una rúbrica', note: 'Contrasta con humanos: comparte sesgos.' },
+          { term: 'RAGAS', value: 'faithfulness, answer_relevancy, context_precision', note: 'Separa fallos de recuperación y de generación.' },
+          { term: 'Tasa de éxito', value: 'ensayos correctos / ensayos totales', note: 'Fija semilla y reinicia el escenario entre ensayos.' },
+        ],
+      },
+      {
+        title: 'Mini-bench paso a paso',
+        items: [
+          { term: '1. Definir tarea', value: 'Escribe la instrucción y el criterio de éxito', note: 'Sin criterio no hay métrica posible.' },
+          { term: '2. Casos', value: '50 ejemplos con entrada y salida esperada', note: 'Incluye casos límite y difíciles.' },
+          { term: '3. Línea base', value: 'Evalúa primero un modelo o regla simple', note: 'Sin base no se puede demostrar mejora.' },
+          { term: '4. Fijar semilla', value: 'seed=42 y parámetros de generación constantes', note: 'La temperatura cambia los resultados.' },
+          { term: '5. Ejecutar', value: 'Mismo prompt y mismo dataset para cada modelo', note: 'Registra latencia y coste además de la calidad.' },
+          { term: '6. Analizar', value: 'Agrupa errores por categoría', note: 'Muestra ejemplos concretos, no solo el promedio.' },
+          { term: '7. Reportar', value: 'Tabla con métrica, intervalo y número de casos', note: 'Publica el prompt y la versión del modelo.' },
+          { term: '8. Repetir', value: 'Vuelve a medir tras cada cambio', note: 'El bench solo sirve si se usa de forma continua.' },
+        ],
+      },
+    ],
+  },
 ];
