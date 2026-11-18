@@ -3022,3 +3022,14 @@ export const companies: { name: string; region: string; detail: string }[] = [
     detail: "Editor y agente de programación con ejecución paralela en worktrees, agentes remotos y una capa de investigación aplicada. Buscan investigadores de modelos e ingenieros de editor e infraestructura de agentes.",
   },
 ];
+
+
+/* =========================================================================
+   Expansión F0-F2: bloques avanzados y Physical AI
+   ========================================================================= */
+import { expansionResources, expansionProjects, expansionGlossary } from './extras/expansion';
+resources.push(...expansionResources);
+projects.push(...expansionProjects);
+glossary.push(...expansionGlossary);
+export { capstones } from './capstones';
+export { interviewQuestions } from './interviews';

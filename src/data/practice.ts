@@ -10,7 +10,7 @@ export type PracticeQuestion = Question & {
   key: string;
   /** Clave para el marcador «Me la sé»: `practice-${lesson.id}-${i}` */
   checkKey: string;
-  trackId: 'robotica' | 'ai';
+  trackId: 'robotica' | 'ai' | 'fisica';
   trackTitle: string;
   moduleId: string;
   moduleTitle: string;

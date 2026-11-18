@@ -4,26 +4,30 @@ import { roboticsPart2 } from './robotics/part2';
 import { roboticsPart3 } from './robotics/part3';
 import { aiModules } from './ai';
 import { agenticModules } from './ai/agentic';
+import { advancedRoboticsModules } from './robotics/advanced';
+import { advancedAiModules } from './ai/advanced';
+import { physicalTrack } from './physical';
 
 export const tracks: Track[] = [
   {
     id: 'robotica',
     title: 'Robótica desde cero',
     tagline: 'De la ley de Ohm al robot que aprende',
-    description: '12 bloques para construir la base completa: electrónica, microcontroladores, motores, sensores, fabricación, ROS 2, control, visión y robot learning. Pensado para alguien que nunca ha sostenido un multímetro.',
+    description: '15 bloques para construir la base completa y luego dominar la depuración eléctrica, el control en tiempo real y la mecatrónica. Pensado para alguien que nunca ha sostenido un multímetro.',
     icon: '⌬',
     accent: '#C4471E',
-    modules: [...roboticsPart1, ...roboticsPart2, ...roboticsPart3]
+    modules: [...roboticsPart1, ...roboticsPart2, ...roboticsPart3, ...advancedRoboticsModules]
   },
   {
     id: 'ai',
     title: 'AI Engineer',
     tagline: 'Para SWE que quieren pasar a IA',
-    description: '13 bloques que asumen que ya sabes programar: fundamentos de ML, deep learning, LLMs, RAG, agentes, inferencia, evals y MLOps, más orquestación con T3 Code y el método de Jensen Huang para exprimir la IA. Lenguaje técnico claro, cero relleno.',
+    description: '16 bloques que asumen que ya sabes programar: ML, deep learning, LLMs, RAG, agentes, inferencia, evals y MLOps, orquestación con T3 Code, método Huang y fiabilidad adversaria. Lenguaje técnico claro, cero relleno.',
     icon: '◈',
     accent: '#5B3FD6',
-    modules: [...aiModules, ...agenticModules]
-  }
+    modules: [...aiModules, ...agenticModules, ...advancedAiModules]
+  },
+  physicalTrack as Track
 ];
 
 export function getTrack(id: string): Track | undefined {

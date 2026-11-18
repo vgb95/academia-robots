@@ -4,6 +4,8 @@ import { BlockRenderer } from './BlockRenderer';
 import { useStore } from '../state/store';
 import { href, go } from '../router';
 import { neighborLessons } from '../data/tracks';
+import { PreTest } from './Review';
+import { ExplainPrompt } from './Mastery';
 
 export function LessonView({ track, module, lesson }: { track: Track; module: Module; lesson: Lesson }) {
   const { state, setProgress, toggleCheck, answerQuiz, setNote, toggleBookmark, setLastLesson } = useStore();
@@ -70,7 +72,15 @@ export function LessonView({ track, module, lesson }: { track: Track; module: Mo
       <ul>{lesson.objectives.map((o, i) => <li key={i}>{o}</li>)}</ul>
     </div>
 
+    <PreTest lessonId={lesson.id} moduleId={module.id} />
+
     <BlockRenderer blocks={lesson.blocks} />
+
+    {lesson.practice && <ExplainPrompt
+      lessonId={lesson.id}
+      objectives={lesson.objectives}
+      success={lesson.practice.success}
+    />}
 
     {lesson.errors && lesson.errors.length > 0 && <section className="errors-section">
       <h2 className="section-title">🔧 Errores comunes</h2>

@@ -4,10 +4,20 @@ import { join } from 'node:path';
 
 const read = p => readFileSync(p, 'utf8');
 const src = 'src';
+const extras = readdirSync('src/data/extras').filter(f => f.endsWith('.ts')).map(f => `src/data/extras/${f}`);
+// Archivos de datos nuevos (bloques avanzados, Physical AI y banco de evaluación).
+const newDataFiles = [
+  'src/data/robotics/advanced.ts',
+  'src/data/ai/advanced.ts',
+  'src/data/physical/index.ts',
+  'src/data/capstones.ts',
+  'src/data/interviews.ts',
+  ...extras
+];
 const dataFiles = [
   'src/data/robotics/part1.ts', 'src/data/robotics/part2.ts', 'src/data/robotics/part3.ts',
   'src/data/ai/index.ts', 'src/data/ai/agentic.ts', 'src/data/labs.ts', 'src/data/shared.ts',
-  ...readdirSync('src/data/extras').filter(f => f.endsWith('.ts')).map(f => `src/data/extras/${f}`)
+  ...newDataFiles
 ];
 const all = dataFiles.map(read).join('\n');
 let problems = 0;
@@ -16,8 +26,8 @@ const ok = (msg) => console.log('  ✓ ' + msg);
 
 console.log('\n=== Integridad de contenido ===\n');
 
-// Lecciones y IDs
-const lessonIds = [...all.matchAll(/id: '([ra]\d+-\d+)'/g)].map(m => m[1]);
+// Lecciones y IDs (r = robótica, a = IA, p = Physical AI)
+const lessonIds = [...all.matchAll(/id: '([rap]\d+-\d+)'/g)].map(m => m[1]);
 const dup = lessonIds.filter((x, i) => lessonIds.indexOf(x) !== i);
 if (dup.length) fail('IDs de lección duplicados: ' + [...new Set(dup)].join(', '));
 else ok(`${lessonIds.length} lecciones con IDs únicos`);
@@ -70,6 +80,63 @@ const cjkLabs = labSrc.split('\n').map((line, i) => /[\u3040-\u9fff\u3400-\u4dbf
 if (cjkLabs.length) fail('Caracteres CJK en src/data/labs.ts: ' + cjkLabs.slice(0, 8).join(', '));
 else ok('Sin caracteres CJK en laboratorios');
 
+// Capstones
+const capSrc = read('src/data/capstones.ts');
+const capstoneIds = [...capSrc.matchAll(/id: '(cap-[^']+)'/g)].map(m => m[1]);
+if (capstoneIds.length !== 2) fail(`Se esperaban 2 capstones, hay ${capstoneIds.length}`);
+const dupCaps = capstoneIds.filter((x, i) => capstoneIds.indexOf(x) !== i);
+if (dupCaps.length) fail('IDs de capstone duplicados: ' + [...new Set(dupCaps)].join(', '));
+else ok(`${capstoneIds.length} capstones con IDs únicos`);
+
+const capBlocks = capSrc.slice(capSrc.indexOf('export const capstones')).split(/\n  \{\n/).slice(1);
+const capProblems = [];
+for (const b of capBlocks) {
+  const id = ((b.match(/id: '(cap-[^']+)'/) || [])[1]) || '?';
+  if (!/rubric:\s*\[/.test(b)) {
+    capProblems.push(`${id}: sin rúbrica`);
+    continue;
+  }
+  const criteria = [...b.matchAll(/criterion:/g)].length;
+  if (criteria !== 5) capProblems.push(`${id}: rúbrica con ${criteria} criterios (esperados 5)`);
+}
+if (capProblems.length) capProblems.forEach(fail);
+else ok(`${capBlocks.length} capstones íntegros: rúbrica de 5 criterios cada uno`);
+
+// Entrevistas
+const intSrc = read('src/data/interviews.ts');
+const interviewIds = [...intSrc.matchAll(/id: '(int-[^']+)'/g)].map(m => m[1]);
+if (interviewIds.length !== 150) fail(`Se esperaban 150 entrevistas, hay ${interviewIds.length}`);
+const dupInt = interviewIds.filter((x, i) => interviewIds.indexOf(x) !== i);
+if (dupInt.length) fail('IDs de entrevista duplicados: ' + [...new Set(dupInt)].join(', '));
+else ok(`${interviewIds.length} entrevistas con IDs únicos`);
+
+const intBlocks = intSrc.slice(intSrc.indexOf('export const interviewQuestions')).split(/\n  \{\n/).slice(1);
+const intProblems = [];
+for (const b of intBlocks) {
+  const id = ((b.match(/id: '(int-[^']+)'/) || [])[1]) || '?';
+  if (!/answer:\s*\{/.test(b)) {
+    intProblems.push(`${id}: sin respuesta estructurada`);
+    continue;
+  }
+  for (const field of ['context', 'decision', 'tradeoff']) {
+    if (!new RegExp(`\\n\\s+${field}:`).test(b)) intProblems.push(`${id}: answer.${field} ausente`);
+  }
+  const followups = ((b.match(/followups:\s*\[([\s\S]*?)\]/) || [])[1]) || '';
+  const followupCount = [...followups.matchAll(/'[^']*'/g)].length;
+  if (followupCount !== 2) intProblems.push(`${id}: ${followupCount} followups (esperados 2)`);
+}
+if (intProblems.length) intProblems.forEach(fail);
+else ok(`${intBlocks.length} entrevistas íntegras: contexto, decisión, compensación y 2 followups`);
+
+// Caracteres CJK en los archivos nuevos
+const cjk = /[\u3040-\u9fff\u3400-\u4dbf\uac00-\ud7af]/;
+const cjkNew = [];
+for (const p of newDataFiles) {
+  read(p).split('\n').forEach((line, i) => { if (cjk.test(line)) cjkNew.push(`${p}:${i + 1}`); });
+}
+if (cjkNew.length) fail('Caracteres CJK en archivos nuevos: ' + cjkNew.slice(0, 8).join(', '));
+else ok('Sin caracteres CJK en los archivos nuevos');
+
 // Caracteres no españoles
 const badChars = /[\u3040-\u9fff\u0400-\u04ff\u0600-\u06ff\uac00-\ud7af]/;
 const bad = [];
@@ -86,7 +153,7 @@ else ok('Sin marcadores de trabajo pendiente');
 
 // Prácticas y quizzes
 let noPractice = 0, noQuiz = 0;
-for (const p of dataFiles.filter(f => f.includes('robotics/') || f.includes('/ai/'))) {
+for (const p of dataFiles.filter(f => f.includes('robotics/') || f.includes('/ai/') || f.includes('/physical/'))) {
   const s = read(p);
   const blocks = s.split(/\n\s*L\(\{/).slice(1);
   for (const b of blocks) {
@@ -99,11 +166,12 @@ else ok('Todas las lecciones tienen práctica y quiz');
 
 // Recursos
 const shared = read('src/data/shared.ts');
-const urls = [...shared.matchAll(/url:\s*['"]([^'"]+)['"]/g)].map(m => m[1]);
+const expansion = read('src/data/extras/expansion.ts');
+const urls = [...`${shared}\n${expansion}`.matchAll(/url:\s*['"]([^'"]+)['"]/g)].map(m => m[1]);
 const dupUrls = urls.filter((x, i) => urls.indexOf(x) !== i);
 if (dupUrls.length) fail('URLs duplicadas: ' + dupUrls.length);
 else ok(`${urls.length} recursos con URLs únicas`);
 
-const resumen = `${lessonIds.length} lecciones, ${labIds.length} laboratorios`;
+const resumen = `${lessonIds.length} lecciones, ${labIds.length} laboratorios, ${capstoneIds.length} capstones, ${interviewIds.length} entrevistas`;
 console.log('\n' + (problems === 0 ? `✅ Todo correcto · ${resumen}` : `❌ ${problems} problema(s) · ${resumen}`) + '\n');
 process.exit(problems ? 1 : 0);

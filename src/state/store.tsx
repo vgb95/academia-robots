@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { openDB, type IDBPDatabase } from 'idb';
+import { schedule, makeRecord, dayKey, type Grade, type SrsRecord } from './srs';
 
 export type Progress = 'todo' | 'doing' | 'done';
 
@@ -10,11 +11,14 @@ export type AppState = {
   notes: Record<string, string>;
   bookmarks: string[];
   lastLesson: string | null;
+  srs: Record<string, SrsRecord>;
+  practiceDays: string[];   // YYYY-MM-DD con >=1 respuesta de repetición
   updatedAt: number;
 };
 
 const EMPTY: AppState = {
-  progress: {}, checks: {}, quiz: {}, notes: {}, bookmarks: [], lastLesson: null, updatedAt: 0
+  progress: {}, checks: {}, quiz: {}, notes: {}, bookmarks: [], lastLesson: null,
+  srs: {}, practiceDays: [], updatedAt: 0
 };
 
 const DB_NAME = 'academia-robots';
@@ -29,9 +33,18 @@ async function getDB(): Promise<IDBPDatabase> {
 
 async function load(): Promise<AppState> {
   try {
-    const db = await getDB();
-    const raw = await db.get(STORE, KEY);
-    if (raw) return { ...EMPTY, ...(raw as AppState) };
+    // Safari/iPad puede bloquear IndexedDB al abrir la PWA: no bloquees la UI.
+    const db = await Promise.race([
+      getDB(),
+      new Promise<null>(resolve => window.setTimeout(() => resolve(null), 1500))
+    ]);
+    if (db) {
+      const raw = await Promise.race([
+        db.get(STORE, KEY),
+        new Promise<null>(resolve => window.setTimeout(() => resolve(null), 1500))
+      ]);
+      if (raw) return { ...EMPTY, ...(raw as AppState) };
+    }
   } catch { /* IndexedDB no disponible: memoria */ }
   try {
     const raw = localStorage.getItem('academia-robots-fallback');
@@ -49,6 +62,7 @@ type Ctx = {
   setNote: (id: string, note: string) => void;
   toggleBookmark: (id: string) => void;
   setLastLesson: (id: string) => void;
+  gradeItem: (id: string, grade: Grade) => void;
   exportJSON: () => void;
   importJSON: (file: File) => Promise<void>;
   resetAll: () => void;
@@ -71,7 +85,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   // grabado depende de ella (no de state completo) para que reflejar la marca
   // de tiempo en el estado no dispare otra grabación en bucle.
   const contentKey = JSON.stringify([
-    state.progress, state.checks, state.quiz, state.notes, state.bookmarks, state.lastLesson
+    state.progress, state.checks, state.quiz, state.notes, state.bookmarks, state.lastLesson,
+    state.srs, state.practiceDays
   ]);
 
   // Persistencia automática: IndexedDB con fallback a localStorage.
@@ -115,6 +130,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const setLastLesson = useCallback((id: string) => {
     setState(s => s.lastLesson === id ? s : { ...s, lastLesson: id });
   }, []);
+  const gradeItem = useCallback((id: string, grade: Grade) => {
+    const today = dayKey();
+    setState(s => ({
+      ...s,
+      srs: { ...s.srs, [id]: schedule(s.srs[id] ?? makeRecord(id), grade) },
+      practiceDays: s.practiceDays.includes(today) ? s.practiceDays : [...s.practiceDays, today]
+    }));
+  }, []);
 
   const exportJSON = useCallback(() => {
     const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
@@ -142,8 +165,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<Ctx>(() => ({
     state, ready, setProgress, toggleCheck, answerQuiz, setNote,
-    toggleBookmark, setLastLesson, exportJSON, importJSON, resetAll
-  }), [state, ready, setProgress, toggleCheck, answerQuiz, setNote, toggleBookmark, setLastLesson, exportJSON, importJSON, resetAll]);
+    toggleBookmark, setLastLesson, gradeItem, exportJSON, importJSON, resetAll
+  }), [state, ready, setProgress, toggleCheck, answerQuiz, setNote, toggleBookmark, setLastLesson, gradeItem, exportJSON, importJSON, resetAll]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

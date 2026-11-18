@@ -30,6 +30,8 @@ export type Lesson = {
   practice?: { task: string; success: string[] };
   quiz?: Question[];
   tags?: string[];
+  objectiveIds?: string[];      // para el grafo de dominio
+  prereqs?: string[];           // IDs de lección de las que depende
 };
 
 export type Module = {
@@ -40,7 +42,7 @@ export type Module = {
 };
 
 export type Track = {
-  id: 'robotica' | 'ai';
+  id: 'robotica' | 'ai' | 'fisica';
   title: string;
   tagline: string;
   description: string;
@@ -51,7 +53,7 @@ export type Track = {
 
 export type Resource = {
   id: string;
-  track: 'robotica' | 'ai' | 'ambos';
+  track: 'robotica' | 'ai' | 'fisica' | 'ambos';
   module: string;
   title: string;
   url: string;
@@ -62,11 +64,33 @@ export type Resource = {
 
 export type Project = {
   id: string;
-  track: 'robotica' | 'ai';
+  track: 'robotica' | 'ai' | 'fisica';
   module: string;
   title: string;
   desc: string;
   effort: string;
 };
 
-export type GlossaryEntry = { term: string; short: string; long: string; track?: 'robotica' | 'ai' | 'ambos' };
+export type GlossaryEntry = { term: string; short: string; long: string; track?: 'robotica' | 'ai' | 'fisica' | 'ambos' };
+
+export type InterviewQuestion = {
+  id: string;
+  track: 'robotica' | 'ai';
+  category: string;
+  q: string;
+  rubric: string[];
+  answer: { context: string; decision: string; tradeoff: string };
+  followups: string[];
+  signal: string;
+};
+
+export type Capstone = {
+  id: string;
+  track: 'robotica' | 'ai';
+  title: string;
+  brief: string;
+  deliverables: string[];
+  metrics: string[];
+  rubric: { criterion: string; weight: number; passes: string }[];
+  eliminates: string[];
+};

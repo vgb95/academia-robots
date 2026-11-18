@@ -21,6 +21,16 @@ export type Route =
   | { name: 'roadmap' }
   | { name: 'studyplan' }
   | { name: 'offline' }
+  | { name: 'review' }
+  | { name: 'mastery' }
+  | { name: 'exam'; moduleId: string }
+  | { name: 'circuit' }
+  | { name: 'scope' }
+  | { name: 'arm' }
+  | { name: 'compare' }
+  | { name: 'portfolio' }
+  | { name: 'interviews' }
+  | { name: 'capstones' }
   | { name: 'search'; q: string }
   | { name: '404' };
 
@@ -50,6 +60,16 @@ function parse(hash: string): Route {
     case 'ruta': case 'roadmap': return { name: 'roadmap' };
     case 'plan': case 'studyplan': return { name: 'studyplan' };
     case 'offline': return { name: 'offline' };
+    case 'repaso': case 'review': return { name: 'review' };
+    case 'dominio': case 'mastery': return { name: 'mastery' };
+    case 'examen': case 'exam': return { name: 'exam', moduleId: parts[1] ?? '' };
+    case 'circuito': case 'circuit': return { name: 'circuit' };
+    case 'osciloscopio': case 'scope': return { name: 'scope' };
+    case 'brazo': case 'arm': return { name: 'arm' };
+    case 'comparar': case 'compare': return { name: 'compare' };
+    case 'portfolio': return { name: 'portfolio' };
+    case 'entrevistas': case 'interviews': return { name: 'interviews' };
+    case 'proyectos-finales': case 'capstones': return { name: 'capstones' };
     case 'search': return { name: 'search', q: parts[1] ?? '' };
     default: return { name: '404' };
   }

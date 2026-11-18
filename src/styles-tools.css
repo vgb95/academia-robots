@@ -1,0 +1,439 @@
+/* ==========================================================================
+   Herramientas guiadas — extensión editorial.
+   Usa exclusivamente los tokens de styles.css: papel #FAF9F6, tinta, serif
+   para titulares, mono para etiquetas y líneas hairline. Sin sombras, sin
+   crema y sin tipografía global añadida.
+   ========================================================================== */
+
+/* ---------- Armazón común ---------- */
+.tool-page { max-width: 1080px; }
+.tool-breadcrumb { margin-bottom: 16px; }
+.tool-crumb { display: inline-flex; align-items: center; gap: 9px; }
+.tool-page-header { margin-bottom: 24px; }
+.tool-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.tool-eyebrow::before { content: ''; width: 26px; height: 1px; flex: 0 0 26px; background: var(--accent); }
+
+.tool-card {
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: clamp(16px, 2.2vw, 26px);
+}
+.tool-card + .tool-card { margin-top: 14px; }
+.tool-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line-2);
+}
+.tool-card-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -.03em;
+}
+.tool-mono {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.tool-note { margin: 12px 0 0; color: var(--ink-2); font-size: 13px; line-height: 1.6; }
+.tool-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+.tool-btn {
+  min-height: 44px;
+  padding: 9px 16px;
+  border-radius: 4px;
+  background: var(--accent);
+  color: var(--paper-2);
+  border: 1px solid var(--accent);
+  font-size: 13px;
+  font-weight: 650;
+}
+.tool-btn:hover:not(:disabled) { filter: brightness(1.08); }
+.tool-btn:disabled { opacity: .45; cursor: not-allowed; }
+.tool-btn--ghost { background: var(--paper-2); color: var(--ink-2); border-color: var(--line); }
+.tool-btn--ghost:hover:not(:disabled) { color: var(--ink); border-color: var(--accent); filter: none; }
+
+.tool-readouts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line-2);
+}
+.tool-readout {
+  display: flex;
+  flex: 1 1 120px;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 9px 12px;
+}
+.tool-readout span {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.tool-readout strong {
+  font-family: var(--font-serif);
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+/* ---------- 1. Circuito guiado ---------- */
+.circuit-stage {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 8px;
+}
+.circuit-svg { display: block; width: 100%; height: auto; }
+.circuit-wire {
+  fill: none;
+  stroke: var(--ink-2);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke-dashoffset .5s ease;
+}
+.circuit-glyph line,
+.circuit-glyph polyline,
+.circuit-glyph polygon {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.circuit-glyph circle { fill: var(--paper-2); stroke: var(--ink); stroke-width: 2; }
+.circuit-glyph text,
+.circuit-corner { font-family: var(--font-mono); font-size: 11px; fill: var(--muted); }
+.circuit-current circle { fill: var(--paper-2); stroke: var(--robot); stroke-width: 2; }
+.circuit-current text { font-family: var(--font-mono); font-size: 12px; fill: var(--robot); }
+
+.circuit-palette { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.circuit-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 4px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 600;
+}
+.circuit-chip:hover:not(:disabled) { border-color: var(--accent); color: var(--ink); }
+.circuit-chip:disabled { cursor: default; }
+.circuit-chip-icon { font-family: var(--font-mono); font-size: 10px; letter-spacing: .06em; color: var(--faint); }
+.circuit-chip--done { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.circuit-chip--done .circuit-chip-icon { color: var(--accent); }
+.circuit-chip--hesitate { border-color: var(--amber); color: var(--amber); animation: circuit-hesitate .38s ease-in-out; }
+@keyframes circuit-hesitate {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  20% { transform: translateX(-4px) rotate(-2deg); }
+  40% { transform: translateX(4px) rotate(2deg); }
+  60% { transform: translateX(-3px) rotate(-1.5deg); }
+  80% { transform: translateX(3px) rotate(1.5deg); }
+}
+
+.circuit-goal {
+  margin: 16px 0 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+.circuit-phrase {
+  margin: 8px 0 0;
+  padding-left: 12px;
+  border-left: 2px solid var(--accent);
+  font-family: var(--font-serif);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.circuit-error {
+  margin: 10px 0 0;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: .06em;
+  color: var(--amber);
+}
+.circuit-progress { margin-left: auto; }
+
+/* ---------- 2. Osciloscopio ---------- */
+.scope-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.scope-mode { display: flex; align-items: center; gap: 10px; }
+.scope-mode-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.scope-select {
+  min-height: 44px;
+  min-width: 150px;
+  padding: 0 12px;
+  border-radius: 4px;
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.scope-stage { background: var(--paper); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
+.scope-svg { display: block; width: 100%; height: auto; }
+.scope-grid line { stroke: var(--line-2); stroke-width: 1; }
+.scope-axis { stroke: var(--line); stroke-width: 1; }
+.scope-ref { stroke: var(--line); stroke-width: 1; stroke-dasharray: 5 6; }
+.scope-trace { fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-linejoin: round; }
+.scope-sda { fill: none; stroke: var(--green); stroke-width: 1.8; stroke-linejoin: round; }
+.scope-scl { fill: none; stroke: var(--ai); stroke-width: 1.8; stroke-linejoin: round; }
+.scope-axis-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .08em;
+  fill: var(--faint);
+}
+.scope-lane-sda { font-family: var(--font-mono); font-size: 12px; fill: var(--green); }
+.scope-lane-scl { font-family: var(--font-mono); font-size: 12px; fill: var(--ai); }
+
+.knobs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 16px; }
+.knob { display: flex; align-items: center; gap: 14px; min-height: 44px; }
+.knob-dial {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+.knob-pointer {
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  width: 2px;
+  height: 16px;
+  margin-left: -1px;
+  background: var(--accent);
+  transform-origin: 50% 19px;
+  transform: rotate(var(--turn, 0deg));
+}
+.knob-body { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 2px; }
+.knob-name { color: var(--ink-2); font-size: 12.5px; font-weight: 600; }
+.knob-range { width: 100%; min-height: 44px; accent-color: var(--accent); cursor: pointer; }
+.knob-value {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: .06em;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+/* ---------- 3. Brazo 2 DOF ---------- */
+.arm-stage { background: var(--paper); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
+.arm-svg { display: block; width: 100%; height: auto; touch-action: none; }
+.arm-grid line { stroke: var(--line-2); stroke-width: 1; }
+.arm-workspace { fill: none; stroke: var(--line); stroke-width: 1; stroke-dasharray: 4 6; }
+.arm-ground { stroke: var(--ink-2); stroke-width: 1.5; }
+.arm-hatch { stroke: var(--line); stroke-width: 1; }
+.arm-pedestal { fill: var(--paper-2); stroke: var(--ink-2); stroke-width: 1.5; }
+.arm-link-1 { stroke: var(--ink-2); stroke-width: 12; stroke-linecap: round; }
+.arm-link-2 { stroke: var(--accent); stroke-width: 9; stroke-linecap: round; }
+.arm-joint { fill: var(--paper-2); stroke: var(--ink); stroke-width: 2; }
+.arm-handle { fill: var(--paper-2); stroke: var(--accent); stroke-width: 2.5; cursor: grab; }
+.arm-handle:active { cursor: grabbing; }
+.arm-angle { font-family: var(--font-mono); font-size: 11px; fill: var(--ink-2); }
+.arm-singular-label {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: .1em;
+  fill: var(--red);
+}
+.arm-jacobian {
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 4px 4px 0;
+}
+.arm-jac-title {
+  margin-bottom: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.arm-jacobian p { margin: 6px 0; color: var(--ink-2); font-size: 13px; line-height: 1.6; }
+.arm-jacobian strong { color: var(--ink); font-variant-numeric: tabular-nums; }
+.arm-jacobian .arm-singular {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: .06em;
+  color: var(--red);
+}
+
+/* ---------- 4. Antes / después ---------- */
+.compare-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 720 / 320;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.compare-layer { position: absolute; inset: 0; }
+.compare-svg,
+.compare-live { display: block; width: 100%; height: 100%; }
+.compare-live { position: absolute; inset: 0; pointer-events: none; }
+.compare-wire {
+  fill: none;
+  stroke: var(--ink-2);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.compare-guide { stroke: var(--line); stroke-width: 1; stroke-dasharray: 4 5; }
+.compare-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .12em;
+  fill: var(--muted);
+}
+.compare-level-label { font-family: var(--font-mono); font-size: 11px; fill: var(--ink-2); }
+.compare-node { fill: var(--paper-2); stroke: var(--ink); stroke-width: 2; }
+.compare-live-line { stroke: var(--robot); stroke-width: 2.5; }
+.compare-live-node { fill: var(--robot); }
+.compare-live-label { font-family: var(--font-mono); font-size: 12px; fill: var(--robot); }
+.compare-divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--ink-2);
+  pointer-events: none;
+}
+.compare-grip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--paper-2);
+  border: 1px solid var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink);
+}
+.compare-control {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+.compare-control span {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.compare-range { width: 100%; min-height: 44px; accent-color: var(--accent); cursor: pointer; }
+.compare-readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line-2);
+}
+.compare-readout > div {
+  display: flex;
+  flex: 1 1 120px;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 9px 12px;
+}
+.compare-readout small {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.compare-readout strong {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+/* ---------- iPad / táctil ---------- */
+@media (max-width: 880px) {
+  .tool-card { padding: 16px; }
+  .knobs { grid-template-columns: 1fr; }
+  .compare-control { grid-template-columns: 1fr; gap: 6px; }
+  .compare-control span:last-child { text-align: right; }
+  .circuit-progress { margin-left: 0; }
+  .compare-stage { aspect-ratio: 720 / 360; }
+}
+@media (max-width: 520px) {
+  .tool-readouts,
+  .compare-readout { flex-direction: column; }
+  .circuit-chip { flex: 1 1 45%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .circuit-chip--hesitate { animation: none; }
+  .circuit-wire { transition: none; }
+}

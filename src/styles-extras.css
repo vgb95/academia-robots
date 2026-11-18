@@ -6,7 +6,7 @@
    Usa exclusivamente los tokens de styles.css: papel claro, tinta oscura,
    serif para titulares, sans para cuerpo, mono para etiquetas, líneas
    hairline, sombras suaves y acentos óxido/violeta. Sin crema, sin
-   JetBrains Mono global y sin sombras duras.
+   tipografía global y sin sombras duras.
    ========================================================================== */
 
 /* ---------- Práctica ---------- */
@@ -365,7 +365,6 @@
 
 /* El SVG trae colores del sketchbook como atributos de presentación; CSS
    gana sobre ellos y los devuelve a la paleta editorial sin editar el TSX. */
-.hero-art svg [fill="#f4ebe0"] { fill: var(--paper); }
 .hero-art svg [fill="#1d1b18"] { fill: var(--ink); }
 .hero-art svg [fill="#46413b"] { fill: var(--ink-2); }
 .hero-art svg [stroke="#1d1b18"] { stroke: var(--ink); }

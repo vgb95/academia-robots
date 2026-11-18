@@ -28,6 +28,7 @@
 
 :root[data-track="robotica"] { --accent: var(--robot); --accent-soft: var(--robot-soft); }
 :root[data-track="ai"]       { --accent: var(--ai);    --accent-soft: var(--ai-soft); }
+:root[data-track="fisica"]   { --accent: var(--green); --accent-soft: #EEF5E7; }
 
 * { box-sizing: border-box; }
 html, body, #root { height: 100%; }

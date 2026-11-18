@@ -11,7 +11,7 @@ type PlanLesson = { id: string; title: string; minutes: number; done: boolean };
 type PlanModule = {
   id: string;
   title: string;
-  track: 'robotica' | 'ai';
+  track: 'robotica' | 'ai' | 'fisica';
   lessons: PlanLesson[];
   minutes: number;
   done: boolean;
@@ -90,7 +90,7 @@ function buildPlan(track: TrackFilter, ritmo: Ritmo, progress: Record<string, Pr
   }
 
   // Un laboratorio por semana, rotando dentro del track de la semana.
-  const labCursor: Record<'robotica' | 'ai', number> = { robotica: 0, ai: 0 };
+  const labCursor: Record<'robotica' | 'ai' | 'fisica', number> = { robotica: 0, ai: 0, fisica: 0 };
   return groups.map((assigned, i) => {
     const weekTrack = assigned[0]?.track ?? 'robotica';
     const sameTrack = labs.filter(l => l.track === weekTrack);

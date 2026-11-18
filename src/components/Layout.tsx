@@ -29,8 +29,13 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
     </>}
     <div className="sidebar-section-title">HERRAMIENTAS</div>
     {[
+      ['/repaso', '↻', 'Repaso de hoy'], ['/dominio', '◉', 'Dominio'],
       ['/laboratorio', '◫', 'Laboratorio'], ['/practica', '✓', 'Práctica'],
+      ['/portfolio', '▤', 'Portfolio'], ['/entrevistas', '¶', 'Entrevistas'],
+      ['/proyectos-finales', '◇', 'Capstones'],
       ['/ruta', '⌁', 'Hoja de ruta'], ['/plan', '▦', 'Plan de estudio'],
+      ['/circuito', '⌗', 'Circuito'], ['/osciloscopio', '∿', 'Osciloscopio'],
+      ['/brazo', '⌇', 'Brazo'], ['/comparar', '⇄', 'Antes/después'],
       ['/esquemas', '◇', 'Esquemas'],
       ['/library', '§', 'Biblioteca'], ['/projects', '⚒', 'Proyectos'],
       ['/glossary', '¶', 'Glosario'], ['/kit', '⌗', 'Banco y BOM'],
@@ -58,6 +63,10 @@ export function Layout({ children }: { children: ReactNode }) {
     let t = '';
     if (route.name === 'track' || route.name === 'module') t = route.track;
     else if (route.name === 'lesson') t = findLesson(route.id)?.track.id ?? '';
+    else if (route.name === 'exam') {
+      const found = tracks.flatMap(x => x.modules).find(m => m.id === route.moduleId);
+      t = found ? tracks.find(x => x.modules.includes(found))?.id ?? '' : '';
+    }
     document.documentElement.dataset.track = t;
   }, [route]);
 

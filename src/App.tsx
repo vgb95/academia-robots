@@ -8,6 +8,11 @@ import { DiagramGalleryPage } from './components/DiagramGallery';
 import { RoadmapPage } from './components/Roadmap';
 import { StudyPlanPage } from './components/StudyPlan';
 import { OfflineGuidePage } from './components/OfflineGuide';
+import { ReviewPage } from './components/Review';
+import { MasteryPage, ExamPage } from './components/Mastery';
+import { GuidedCircuitPage, OscilloscopePage, ArmViewerPage, BeforeAfterPage } from './components/GuidedTools';
+import { PortfolioPage, InterviewPage } from './components/Portfolio';
+import { CapstonesPage } from './components/CapstonesPage';
 import { useRoute } from './router';
 import { findLesson } from './data/tracks';
 
@@ -39,6 +44,16 @@ export default function App() {
     case 'roadmap': content = <RoadmapPage />; break;
     case 'studyplan': content = <StudyPlanPage />; break;
     case 'offline': content = <OfflineGuidePage />; break;
+    case 'review': content = <ReviewPage />; break;
+    case 'mastery': content = <MasteryPage />; break;
+    case 'exam': content = <ExamPage moduleId={route.moduleId} />; break;
+    case 'circuit': content = <GuidedCircuitPage />; break;
+    case 'scope': content = <OscilloscopePage />; break;
+    case 'arm': content = <ArmViewerPage />; break;
+    case 'compare': content = <BeforeAfterPage />; break;
+    case 'portfolio': content = <PortfolioPage />; break;
+    case 'interviews': content = <InterviewPage />; break;
+    case 'capstones': content = <CapstonesPage />; break;
     case 'notes': content = <NotesPage />; break;
     case 'search': content = <SearchPage q={route.q} />; break;
     default: content = <NotFound />;

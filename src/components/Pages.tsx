@@ -33,7 +33,7 @@ export function HomePage() {
         const d = lessons.filter(l => state.progress[l.id] === 'done').length;
         const p = Math.round(d / Math.max(1, lessons.length) * 100);
         return <a key={t.id} className={`track-card ${t.id}`} href={href(`/track/${t.id}`)}>
-          <div className="track-index">{t.id === 'robotica' ? '01 / SISTEMAS FÍSICOS' : '02 / SISTEMAS COGNITIVOS'}</div>
+          <div className="track-index">{t.id === 'robotica' ? '01 / SISTEMAS FÍSICOS' : t.id === 'ai' ? '02 / SISTEMAS COGNITIVOS' : '03 / IA ENCARNADA'}</div>
           <div className="track-icon">{t.icon}</div>
           <h2>{t.title}</h2>
           <div className="track-tagline">{t.tagline}</div>

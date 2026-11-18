@@ -11,7 +11,11 @@ export default defineConfig({
           if (id.includes('node_modules')) return 'vendor';
           if (id.includes('/src/data/robotics/')) return 'content-robotics';
           if (id.includes('/src/data/ai/')) return 'content-ai';
+          if (id.includes('/src/data/physical/')) return 'content-physical';
+          if (id.includes('/src/data/capstones.ts')) return 'content-capstones';
+          if (id.includes('/src/data/interviews.ts')) return 'content-interviews';
           if (id.includes('/src/data/extras/')) return 'content-extras';
+          if (id.includes('/src/state/srs.ts')) return 'study-srs';
           if (id.includes('/src/data/diagrams.ts') || id.includes('/src/data/shared.ts')) return 'content-core';
         }
       }
