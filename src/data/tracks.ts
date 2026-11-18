@@ -3,6 +3,7 @@ import { roboticsPart1 } from './robotics/part1';
 import { roboticsPart2 } from './robotics/part2';
 import { roboticsPart3 } from './robotics/part3';
 import { aiModules } from './ai';
+import { agenticModules } from './ai/agentic';
 
 export const tracks: Track[] = [
   {
@@ -18,10 +19,10 @@ export const tracks: Track[] = [
     id: 'ai',
     title: 'AI Engineer',
     tagline: 'Para SWE que quieren pasar a IA',
-    description: '11 bloques que asumen que ya sabes programar: fundamentos de ML, deep learning, LLMs, RAG, agentes, inferencia, evals y MLOps. Lenguaje técnico claro, cero relleno.',
+    description: '13 bloques que asumen que ya sabes programar: fundamentos de ML, deep learning, LLMs, RAG, agentes, inferencia, evals y MLOps, más orquestación con T3 Code y el método de Jensen Huang para exprimir la IA. Lenguaje técnico claro, cero relleno.',
     icon: '◈',
     accent: '#5B3FD6',
-    modules: aiModules
+    modules: [...aiModules, ...agenticModules]
   }
 ];
 

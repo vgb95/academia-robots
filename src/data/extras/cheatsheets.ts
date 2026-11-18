@@ -1329,4 +1329,188 @@ export const cheatsheets: CheatSection[] = [
       },
     ],
   },
+
+  /* =====================================================================
+      19. T3 CODE: COMANDOS Y FLUJO
+      ===================================================================== */
+  {
+    id: 't3-code',
+    title: 'T3 Code: comandos y flujo',
+    track: 'ai',
+    description: 'Instalación, CLIs, login y ciclo de trabajo con el agente: worktrees, permisos, checkpoints, diff, PR, policy y remoto.',
+    groups: [
+      {
+        title: 'Instalación, CLIs y acceso',
+        items: [
+          { term: 'Instalación', value: 'npm i -g @t3/code  (o el gestor indicado por el proyecto)', note: 'Verifica la versión con t3 --version antes de empezar.' },
+          { term: 'CLIs principales', value: 't3 (agente), t3-code (servicio/control plane)', note: 'La CLI de t3 es la interfaz de usuario; el control plane coordina las sesiones.' },
+          { term: 'Login', value: 't3 login', note: 'Autentica contra el proveedor y guarda las credenciales en el perfil local.' },
+          { term: 'Estado de sesión', value: 't3 status', note: 'Muestra login, workspace activo y threads en curso.' },
+          { term: 'Proveedores', value: 't3 providers  →  selecciona modelo/backend', note: 'Los providers desacoplan el modelo del flujo de trabajo del agente.' },
+          { term: 'Ayuda', value: 't3 --help  /  t3 <comando> --help', note: 'La forma más rápida de descubrir flags y subcomandos de tu versión.' },
+          { term: 'Actualización', value: 'npm i -g @t3/code@latest', note: 'Tras actualizar, revisa changelog: los permisos y políticas pueden cambiar.' },
+        ],
+      },
+      {
+        title: 'Worktree, thread y ejecución',
+        items: [
+          { term: 'Arrancar tarea', value: 't3 " describir la tarea "', note: 'El brief debe incluir objetivo, criterios de aceptación y cómo verificar.' },
+          { term: 'Worktree', value: 't3 worktree create  /  t3 worktree list', note: 'Cada tarea trabaja en un checkout aislado; evita tocar tu directorio principal.' },
+          { term: 'Cambiar de worktree', value: 't3 worktree switch <nombre>', note: 'Útil para revisar el trabajo de otra tarea sin perder la sesión actual.' },
+          { term: 'Thread', value: 't3 thread list  /  t3 thread resume <id>', note: 'Un thread es la conversación con su historial; puedes retomarlo más tarde.' },
+          { term: 'Paralelismo', value: 'lanzar varios threads, cada uno en su worktree', note: 'Solo para tareas independientes con interfaces y archivos bien separados.' },
+          { term: 'Plan antes de editar', value: 't3 --plan  (modo planificación)', note: 'El agente investiga y propone pasos sin escribir en el worktree.' },
+          { term: 'Control plane', value: 'capa que decide qué herramienta actúa en cada paso', note: 'Separa la decisión de la ejecución local del agente.' },
+        ],
+      },
+      {
+        title: 'Permisos, checkpoints y seguridad',
+        items: [
+          { term: 'Modo de permiso', value: 'read-only | ask | auto-edit | auto-all', note: 'Define qué puede hacer el agente sin preguntar: leer, editar, ejecutar.' },
+          { term: 'Solo lectura', value: 't3 --permission read-only', note: 'Explora y razona sin modificar nada; ideal para auditar propuestas.' },
+          { term: 'Confirmación por acción', value: 't3 --permission ask', note: 'El agente pide aprobación antes de cada cambio o comando relevante.' },
+          { term: 'Checkpoint', value: 't3 checkpoint create "<etiqueta>"', note: 'Guarda el estado de la sesión antes de un cambio grande o arriesgado.' },
+          { term: 'Restaurar checkpoint', value: 't3 checkpoint restore <id>', note: 'Vuelve al estado anterior si el resultado empeoró; es un undo de sesión.' },
+          { term: 'Listar checkpoints', value: 't3 checkpoint list', note: 'Permite comparar versiones intermedias de la misma tarea.' },
+          { term: 'Policy', value: 't3 policy ...  (reglas de comandos, archivos y gasto)', note: 'Las policies son reglas granulares que bloquean acciones aunque el modo sea permisivo.' },
+          { term: 'Límites', value: '--max-steps, --max-tokens, --budget, --timeout', note: 'Cortan ejecuciones en bucle y evitan facturas inesperadas.' },
+          { term: 'Auditoría', value: 't3 log  /  historial del thread', note: 'Registra comandos y decisiones para revisar después qué hizo el agente.' },
+        ],
+      },
+      {
+        title: 'Diff, PR y remoto',
+        items: [
+          { term: 'Ver diff', value: 't3 diff  (o git diff dentro del worktree)', note: 'Revisa cambios reales, no solo el resumen del agente.' },
+          { term: 'Revisar archivos tocados', value: 't3 diff --stat', note: 'Detecta archivos fuera de alcance antes de aceptar el trabajo.' },
+          { term: 'Commitear', value: 't3 commit  /  git commit en el worktree', note: 'Cada tarea deja sus cambios confirmados en su propia rama.' },
+          { term: 'Abrir PR', value: 't3 pr create', note: 'El agente crea título y descripción a partir de la tarea; requiere permiso de remoto.' },
+          { term: 'Ver PRs', value: 't3 pr list', note: 'Sigue el estado de las propuestas generadas por los threads.' },
+          { term: 'Remoto', value: 't3 remote  /  git fetch, git push', note: 'Limitar permisos de push evita escrituras no deseadas en ramas compartidas.' },
+          { term: 'Human in the loop', value: 'aprobar plan → revisar diff → decidir PR', note: 'El agente ejecuta; la persona valida en cada punto clave.' },
+          { term: 'Descartar tarea', value: 't3 worktree remove <nombre>', note: 'Si el resultado no sirve, se elimina el worktree sin afectar al repositorio principal.' },
+        ],
+      },
+    ],
+  },
+
+  /* =====================================================================
+      20. PATRONES DE ORQUESTACIÓN DE AGENTES
+      ===================================================================== */
+  {
+    id: 'orquestacion',
+    title: 'Patrones de orquestación de agentes',
+    track: 'ai',
+    description: 'Cómo repartir trabajo entre varios agentes: paralelización, revisor independiente, división de tareas, prompts de delegación y defensas contra fallos.',
+    groups: [
+      {
+        title: 'Paralelización',
+        items: [
+          { term: 'Regla de oro', value: 'paraleliza solo tareas independientes', note: 'Si comparten archivos o estado, el paralelismo crea conflictos.' },
+          { term: 'Fan-out', value: 'repartir una tarea en N ramas simultáneas', note: 'Cada rama con su propio worktree y su criterio de éxito.' },
+          { term: 'Fan-in', value: 'reunir y sintetizar los N resultados', note: 'Un agente integrador valida y combina las piezas.' },
+          { term: 'Aislamiento', value: 'un worktree por agente', note: 'Evita que un agente pise los cambios de otro.' },
+          { term: 'Interfaces', value: 'definir entrada y salida de cada subtarea', note: 'Sin contrato claro, los resultados no se pueden ensamblar.' },
+          { term: 'Coste de coordinación', value: 'tiempo y tokens extra por dividir y reunir', note: 'Para tareas pequeñas, un solo agente suele ser más barato y rápido.' },
+          { term: 'Límites por rama', value: 'topes de pasos y tokens para cada agente', note: 'Una rama desbocada no debe bloquear a las demás.' },
+        ],
+      },
+      {
+        title: 'Revisor y control de calidad',
+        items: [
+          { term: 'Rol de reviewer', value: 'agente distinto del implementador', note: 'Contexto fresco y criterios propios: detecta lo que el autor no ve.' },
+          { term: 'Sesgo de anclaje', value: 'quien escribió tiende a confirmar su enfoque', note: 'Por eso el revisor no debe ser la misma sesión.' },
+          { term: 'Rúbrica de revisión', value: 'corrección, casos límite, alcance, estilo, seguridad', note: 'Dar criterios concretos mejora la revisión más que pedir "revisa esto".' },
+          { term: 'Revisión ciega', value: 'pasar el diff sin el razonamiento del autor', note: 'Reduce el sesgo: el revisor juzga el código, no la intención.' },
+          { term: 'Bucle de corrección', value: 'revisar → corregir → volver a revisar', note: 'Con límites: dos o tres iteraciones antes de escalar a un humano.' },
+          { term: 'Segunda IA', value: 'modelo distinto contrastando la respuesta', note: 'Aporta divergencia frente a los sesgos del primer modelo.' },
+          { term: 'Veredicto explícito', value: 'aprobar / reprobar con razones y evidencia', note: 'Evita reseñas ambiguas que no se pueden accionar.' },
+        ],
+      },
+      {
+        title: 'División de tareas y prompts de delegación',
+        items: [
+          { term: 'Descomposición', value: 'dividir por módulo, archivo o fase (investigar / implementar / testear)', note: 'Cada pieza debe tener un criterio de terminación claro.' },
+          { term: 'Prompt de delegación', value: 'objetivo + contexto mínimo + restricciones + herramientas + formato + verificación', note: 'El contexto mínimo evita que el agente asuma cosas fuera de alcance.' },
+          { term: 'Alcance explícito', value: 'lista de archivos permitidos y prohibidos', note: 'Es la defensa más simple contra cambios no deseados.' },
+          { term: 'Formato de salida', value: 'pide JSON, lista o diff concreto', note: 'Facilita que el agente integrador pueda combinar resultados.' },
+          { term: 'Criterio de éxito', value: 'tests que deben pasar o condición comprobable', note: 'Sin él, no se puede decidir si la subtarea terminó.' },
+          { term: 'Orden de dependencias', value: 'investigación → implementación → revisión → integración', note: 'Solo paraleliza las fases que no se dependen entre sí.' },
+          { term: 'Plantilla de encargo', value: 'Haz X en Y; no toques Z; verifica con W; responde en formato V.', note: 'Repetible y fácil de auditar entre threads.' },
+        ],
+      },
+      {
+        title: 'Cuándo no usar y defensas',
+        items: [
+          { term: 'No usar si…', value: 'tarea pequeña o muy acoplada', note: 'La coordinación cuesta más que el trabajo mismo.' },
+          { term: 'No usar si…', value: 'no hay forma objetiva de verificar el resultado', note: 'Sin verificación, los errores se propagan sin control.' },
+          { term: 'No usar si…', value: 'el contexto compartido es enorme', note: 'Repetirlo en cada agente dispara coste y contradicciones.' },
+          { term: 'Defensa: checkpoints', value: 'guardar estado antes de cada fase', note: 'Permite volver atrás si una rama contamina el resultado.' },
+          { term: 'Defensa: verificación', value: 'tests y fuentes primarias antes de aceptar', note: 'La salida de un agente es un borrador, no un hecho.' },
+          { term: 'Defensa: límites', value: 'topes de pasos, tokens, coste y tiempo', note: 'Cortan bucles y contienen el impacto de un fallo.' },
+          { term: 'Defensa: auditoría', value: 'registro de acciones de cada agente', note: 'Permite reconstruir qué pasó y dónde se introdujo el error.' },
+          { term: 'Métrica de decisión', value: 'tiempo a resultado correcto y coste total vs. un agente', note: 'Si no mejora ambos, simplifica la orquestación.' },
+        ],
+      },
+    ],
+  },
+
+  /* =====================================================================
+      21. MÉTODO HUANG: PREGUNTAS Y VERIFICACIÓN
+      ===================================================================== */
+  {
+    id: 'metodo-huang',
+    title: 'Método Huang: preguntas y verificación',
+    track: 'ai',
+    description: 'Preguntar cómo preguntar, bucle recursivo, contraste con una segunda IA, fuentes primarias, controlabilidad y checklist de verificación con métricas antes/después.',
+    groups: [
+      {
+        title: 'Preguntar cómo preguntar',
+        items: [
+          { term: 'Meta-pregunta', value: '¿Cómo debo formular esta pregunta para obtener una mejor respuesta?', note: 'Mejora el prompt antes de gastar una respuesta completa.' },
+          { term: 'Pedir supuestos', value: '¿Qué estoy dando por supuesto y qué falta en el contexto?', note: 'Saca a la luz los vacíos que el humano no ve.' },
+          { term: 'Bucle recursivo', value: 'pregunta → mejorar pregunta → repetir', note: 'Iterar sobre la pregunta suele dar más que iterar sobre la respuesta.' },
+          { term: 'Ambigüedad', value: 'pedir que señale interpretaciones posibles', note: 'Una pregunta ambigua produce una respuesta correcta para el problema equivocado.' },
+          { term: 'Formato primero', value: 'pedir la estructura de la respuesta antes del contenido', note: 'Fija la forma y luego pide el fondo.' },
+          { term: 'Principio', value: 'la calidad de la respuesta está limitada por la calidad de la pregunta', note: 'Basura entra, basura sale.' },
+        ],
+      },
+      {
+        title: 'Contraste: segunda IA y fuente primaria',
+        items: [
+          { term: 'Segunda IA', value: 'otro modelo revisa la respuesta del primero', note: 'Modelo distinto o sesión independiente.' },
+          { term: 'Por qué otro modelo', value: 'evita confirmación y sesgos compartidos', note: 'El mismo modelo tiende a ratificar su primera salida.' },
+          { term: 'Pregunta al revisor', value: '¿Qué hay de incorrecto o incompleto aquí?', note: 'Pedir errores concretos da más que preguntar si te parece bien.' },
+          { term: 'Fuente primaria', value: 'paper, documentación oficial, código o dato original', note: 'La IA es un atajo hacia la fuente, no un sustituto de ella.' },
+          { term: 'Citar', value: 'pedir enlace o referencia verificable de cada afirmación', note: 'Una afirmación sin fuente es una hipótesis.' },
+          { term: 'Trampas', value: 'alucinación, paráfrasis inexacta, fuente inventada', note: 'Especialmente peligroso cuando el tono es seguro.' },
+          { term: 'Prioridad', value: 'fuente primaria > segunda IA > primera respuesta', note: 'Contrastar siempre de abajo arriba.' },
+        ],
+      },
+      {
+        title: 'Controlabilidad y definir "mejor"',
+        items: [
+          { term: 'Controlabilidad', value: 'el humano decide rumbo, límites y cuándo parar', note: 'La IA es el copiloto; el volante sigue tuyo.' },
+          { term: 'Instrucciones precisas', value: 'rol, contexto, restricciones, formato y criterio de aceptación', note: 'Cuanto más explícito, menos improvisación.' },
+          { term: 'Definir mejor', value: 'fijar métrica u objetivo antes de pedir una mejora', note: 'Sin definición, el modelo optimiza estilo en vez del problema.' },
+          { term: 'Ejemplo de métrica', value: 'tasa de error, tiempo de ejecución, cobertura de tests, claridad', note: 'Debe ser medible y comprobable en el resultado.' },
+          { term: 'Riesgo', value: 'mejoras que suenan bien pero no resuelven nada', note: 'El criterio evita optimizar la apariencia.' },
+          { term: 'Límites de la sesión', value: 'pasos, tokens, coste y tiempo', note: 'Contienen la deriva y fuerzan a reevaluar.' },
+        ],
+      },
+      {
+        title: 'Verificación, checklist y métricas',
+        items: [
+          { term: 'Checklist 1', value: '¿Responde realmente a la pregunta planteada?', note: 'A veces responde a una pregunta vecina.' },
+          { term: 'Checklist 2', value: '¿Está respaldada por una fuente primaria?', note: 'Busca el documento original, no una mención de segunda mano.' },
+          { term: 'Checklist 3', value: '¿La confirmó una segunda IA o una prueba?', note: 'Contraste independiente del primer modelo.' },
+          { term: 'Checklist 4', value: '¿Cumple el criterio de "mejor" definido?', note: 'Compara con la métrica acordada antes de empezar.' },
+          { term: 'Métricas antes/después', value: 'registrar calidad, tiempo y errores antes y después', note: 'Sin línea base no se puede demostrar mejora.' },
+          { term: 'Anti-patrón', value: 'aceptar la primera respuesta sin verificar', note: 'El borrador nunca es el producto final.' },
+          { term: 'Anti-patrón', value: 'repetir la misma pregunta tras un mal resultado', note: 'Hay que reformular, no insistir.' },
+          { term: 'Anti-patrón', value: 'delegar el juicio crítico al modelo', note: 'La decisión final siempre es humana.' },
+          { term: 'Cierre del ciclo', value: 'reformular → contrastar → medir → decidir', note: 'Aceptar o iterar una vez más, con evidencia.' },
+        ],
+      },
+    ],
+  },
 ];

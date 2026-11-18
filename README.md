@@ -3,7 +3,7 @@
 Web app interactiva y **offline-first** en español. Dos tracks independientes:
 
 - **🤖 Robótica desde cero** — 12 bloques, desde la ley de Ohm hasta robots que aprenden.
-- **🧠 AI Engineer** — 11 bloques para desarrolladores de software que quieren pasar a IA.
+- **🧠 AI Engineer** — 13 bloques para desarrolladores de software que quieren pasar a IA, orquestar agentes con T3 Code y exprimir la IA con el método de Jensen Huang.
 
 ## Ejecutar
 
@@ -28,6 +28,7 @@ src/
 ├── data/
 │   ├── robotics/part1.ts … part3.ts   # Bloques b0–b11
 │   ├── ai/index.ts                    # Bloques a0–a10
+│   ├── ai/agentic.ts                  # Bloques a11–a12 (T3 Code y método Huang)
 │   ├── shared.ts                      # Recursos, proyectos, glosario, BOM, empresas
 │   ├── extras/                        # Casos reales, flashcards, diagnosis, chuletas
 │   ├── diagrams.ts                    # Registro de esquemas SVG

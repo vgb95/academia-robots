@@ -525,6 +525,41 @@ export const D: Record<string, () => string> = {
     { label: 'Fugas de PII', sub: 'datos personales' },
     { label: 'Defensas', sub: 'input/output filters, sandbox, permisos', color: '#F5C16C' }
   ]),
+  t3_arquitectura: () => layers('T3 Code: control plane de agentes', [
+    { label: 'Harnesses locales', sub: 'Claude Code · Codex · OpenCode · Cursor · Grok · Antigravity', color: '#B9A6FF' },
+    { label: 'Adaptadores', sub: 'cada agente → eventos comunes' },
+    { label: 'T3 Code', sub: 'threads, permisos, diffs, checkpoints, worktrees', color: '#F5C16C' },
+    { label: 'Clientes', sub: 'desktop · web · iOS · Android', color: '#7FD1C1' }
+  ]),
+  t3_thread: () => flow('Un hilo, un workspace aislado', [
+    { label: 'New thread', sub: 'elige agente y modelo' }, { label: 'Worktree', sub: 'rama propia' },
+    { label: 'Edits + diff', sub: 'revisión por turno' }, { label: 'Commit / PR', sub: 'un botón', color: '#F5C16C' }
+  ]),
+  t3_permisos: () => layers('Modos de permiso', [
+    { label: 'Supervised', sub: 'pregunta antes de cada comando o cambio' },
+    { label: 'Auto-accept edits', sub: 'acepta ediciones; otras acciones preguntan' },
+    { label: 'Auto', sub: 'menos fricción, aún con límites' },
+    { label: 'Full access', sub: 'sin preguntas: solo en entornos desechables', color: '#FF7A70' }
+  ]),
+  huang_loop: () => flow('Aprender con IA hasta entender', [
+    { label: 'No sé preguntar', sub: 'pídele a la IA que formule la pregunta' },
+    { label: 'Pregunta afinada', sub: 'revísala: ¿refleja lo que quieres?' },
+    { label: 'Respuesta', sub: 'explícamelo como si no supiera' },
+    { label: 'Otra IA la critica', sub: 'contrasta dos respuestas', color: '#B9A6FF' },
+    { label: 'Fuente primaria', sub: 'verifica cifras y fechas', color: '#F5C16C' }
+  ], 760, 230),
+  explotar_ia: () => compare('Dos formas de usar IA', { label: 'Delegar', sub: 'que piense por ti' }, { label: 'Aprender', sub: 'que te enseñe a pensar' }, [
+    'Delegar: rápido, frágil, no acumula criterio',
+    'Aprender: lento al principio, construye ventaja durable',
+    'La carrera la gana quien explota mejor la tecnología'
+  ]),
+  orquestacion_trabajo: () => layers('Orquestar IA en el trabajo', [
+    { label: 'Elige una tarea', sub: 'repetitiva, acotada, medible' },
+    { label: 'Define "mejor" antes', sub: 'tiempo, precisión, claridad o coste' },
+    { label: 'Elige agente y permisos', sub: 'según riesgo y contexto' },
+    { label: 'Paraleliza en worktrees', sub: 'un hilo por tarea' },
+    { label: 'Revisa y mide', sub: 'diff, verificaciones y métrica real', color: '#7FD1C1' }
+  ]),
   diseno_ia: () => layers('System design de un sistema de IA', [
     { label: 'Requisitos', sub: 'latencia, coste, calidad' }, { label: 'Selección de modelo', sub: 'tamaño vs coste' },
     { label: 'Retrieval y caché', sub: 'si aplica' }, { label: 'Observabilidad', sub: 'trazas y evals' },

@@ -6,7 +6,7 @@ const read = p => readFileSync(p, 'utf8');
 const src = 'src';
 const dataFiles = [
   'src/data/robotics/part1.ts', 'src/data/robotics/part2.ts', 'src/data/robotics/part3.ts',
-  'src/data/ai/index.ts', 'src/data/shared.ts',
+  'src/data/ai/index.ts', 'src/data/ai/agentic.ts', 'src/data/shared.ts',
   ...readdirSync('src/data/extras').map(f => `src/data/extras/${f}`)
 ];
 const all = dataFiles.map(read).join('\n');

@@ -16,7 +16,7 @@ export function HomePage() {
     <section className="hero">
       <div className="hero-eyebrow">Field manual · dos caminos, una obsesión</div>
       <h1>Construye lo que<br />aún no existe.</h1>
-      <p className="hero-lead">Robótica desde el multímetro cero, para quien quiere que el mundo físico obedezca. AI Engineer para quien ya escribe software y quiere sistemas que piensan. Dos rutas, una academia, cero relleno.</p>
+      <p className="hero-lead">Robótica desde el multímetro cero, para quien quiere que el mundo físico obedezca. AI Engineer para quien ya escribe software y quiere orquestar agentes exprimiendo la IA al máximo. Dos rutas, una academia, cero relleno.</p>
       <div className="hero-edition">Vol. 01 — {s.lessons} lecciones — edición 2026</div>
       <div className="hero-stats">
         <div><strong>{s.lessons}</strong><span>lecciones</span></div>
