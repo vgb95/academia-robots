@@ -38,7 +38,8 @@ M('b0', 'Orientación y supervivencia', 'Por qué robótica, qué es el trabajo 
       ]),
       diagrama('arquitectura', 'La separación real entre computadora de alto nivel y microcontrolador de tiempo real.'),
       apunte('Lo que buscan las ofertas', 'C++ y Python, hardware real, profundidad en algo + literals en el resto, y debugging como habilidad propia. No suele aparecer un título universitario concreto.'),
-      p('El error clásico es intentar dominar las siete capas a la vez. La estrategia correcta es volverte profundo en una y competente en el resto.Este roadmap te da esa base amplia y te deja elegir al final.'),
+      nota('Un término de la tabla: PWM (modulación por ancho de pulso) consiste en encender y apagar un pin muy rápido para simular un voltaje intermedio; lo veremos en detalle en r3-2.'),
+      p('El error clásico es intentar dominar las siete capas a la vez. La estrategia correcta es volverte profundo en una y competente en el resto. Este roadmap te da esa base amplia y te deja elegir al final.'),
       nota('Si vienes de ser SWE, tu ventaja está en sistemas, tooling y software quality. Tu deuda está en electrónica y control. Por eso el track de robótica empieza en el multímetro, no en ROS.')
     ],
     practice: { task: 'Elige un proyecto real (por ejemplo un seguidor de línea) y escribe, para cada una de las 7 capas de la tabla, qué pregunta concreta responde y qué medirías para validarla. Marca cuál sería tu capa de profundidad y cuáles serían de "literato".', success: ['Cubres las 7 capas con una pregunta y una métrica cada una', 'Identificas tu capa de profundidad y justificas la elección', 'Nombras una herramienta real de cada capa'] },
@@ -73,7 +74,7 @@ M('b0', 'Orientación y supervivencia', 'Por qué robótica, qué es el trabajo 
         p('Piensa en un circuito como en agua por una tubería. El **voltaje** es la presión, la **corriente** es el caudal y la **resistencia** es lo estrecha que es la tubería.'),
         formula('V = I · R   |   I = V / R   |   R = V / I', 'V en voltios (V), I en amperios (A), R en ohmios (Ω).'),
         diagrama('ley_ohm', 'El triángulo de Ohm: tapa lo que buscas y lee la operación.'),
-        p('Ejemplo: un LED con Vf ≈ 2 V alimentado desde 5 V y con una resistencia de 330 Ω. La corriente es (5−2)/330 ≈ 9 mA. Suficiente para brillar, seguro para el pin.'),
+        p('Ejemplo: un LED con Vf ≈ 2 V (la "caída de tensión" del LED: el voltaje que consume al encender, ~2 V) alimentado desde 5 V y con una resistencia de 330 Ω. La corriente es (5−2)/330 ≈ 9 mA. Suficiente para brillar, seguro para el pin.'),
         widget('ohm'),
         apunte('La analogía tiene un límite', 'En electricidad los electrones no se "consumen" como el agua: la corriente es igual en todos los puntos de un circuito en serie. Lo que se disipa es energía, en forma de calor.'),
         tabla(['Magnitud', 'Símbolo', 'Unidad', 'Se mide con'], [['Voltaje', 'V', 'voltio', 'multímetro en paralelo'], ['Corriente', 'I', 'amperio', 'multímetro en serie'], ['Resistencia', 'R', 'ohmio', 'multímetro con circuito apagado'], ['Potencia', 'P', 'vatio', 'P = V·I']]),
@@ -104,12 +105,13 @@ M('b0', 'Orientación y supervivencia', 'Por qué robótica, qué es el trabajo 
       id: 'r1-3', title: 'Divisores de voltaje y su trampa', min: 15,
       objectives: ['Diseñar divisores', 'Entender la carga y por qué fallan'],
       blocks: [
-        p('Un divisor de voltaje toma una tensión mayor y produce una menor. Es la forma más barata de adaptar un sensor de 5 V a un ADC de 3.3 V.'),
-        formula('Vout = Vin · R2 / (R1 + R2)', 'R1 arriba (a Vin), R2 abajo (a GND).'),
+        p('Un divisor de voltaje toma una tensión mayor y produce una menor. Es la forma más barata de adaptar un sensor de 5 V a un ADC de 3.3 V. Un ADC (convertidor analógico-digital) es el periférico del microcontrolador que transforma un voltaje en un número; lo estudiaremos en detalle en r3-3.'),
+        formula('Vout = Vin · R2 / (R1 + R2)', 'R1 arriba (a Vin), R2 abajo (a GND, la masa: el punto de referencia de 0 V, que veremos en r1-8).'),
         diagrama('divisor', 'El nodo entre R1 y R2 es la salida.'),
-        aviso('La trampa: el divisor asume que nada carga la salida. Si conectas un pin ADC, este tiene una impedancia de entrada; si conectas una carga baja, el divisor se desploma. Para sensores de alta impedancia está bien; para alimentar algo, usa un regulador o un buffer.'),
+        aviso('La trampa: el divisor asume que nada carga la salida. Si conectas un pin ADC, este tiene una impedancia de entrada —la resistencia equivalente que el pin presenta a lo que conectas, que veremos en detalle en r3-3—; si conectas una carga baja, el divisor se desploma. Para sensores de alta impedancia está bien; para alimentar algo, usa un regulador o un buffer.'),
+        apunte('Buffer o seguidor', 'Un amplificador operacional (op-amp) es un chip que amplifica la diferencia entre sus dos entradas. Configurado con ganancia 1 —un seguidor o buffer—, la salida copia la entrada pero puede entregar mucha más corriente: así la carga no descarga el divisor. Los op-amps se verán en detalle más adelante.'),
         apunte('Regla práctica', 'Haz que la corriente por el divisor sea al menos 10× la corriente que consumirá la carga. R total baja = más consumo pero más estabilidad.'),
-        p('Ejemplo: convertir 5 V a 3.3 V con R1=10 kΩ. Despejando R2 = Vin... R2 = R1·Vout/(Vin−Vout) = 10k·3.3/1.7 ≈ 19.4 kΩ.'),
+        p('Ejemplo: convertir 5 V a 3.3 V con R1=10 kΩ. Despejando R2 de la fórmula: R2 = R1·Vout/(Vin−Vout) = 10k·3.3/1.7 ≈ 19.4 kΩ.'),
         widget('divisor')
       ],
       errors: [err('La lectura del ADC es menor de lo esperado', 'El divisor está siendo cargado por la impedancia del ADC', 'Baja los valores de R (ej. 2k/3.3k) o añade un seguidor con op-amp.')],
@@ -154,12 +156,12 @@ M('b0', 'Orientación y supervivencia', 'Por qué robótica, qué es el trabajo 
         diagrama('mosfet', 'MOSFET: el voltaje en la gate crea el canal conductor.'),
         tabla(['', 'BJT (NPN)', 'MOSFET canal N'], [
           ['Se controla con', 'Corriente en base', 'Voltaje en gate'],
-          ['Resistencia de base', 'Necesaria (1 kΩ típico)', 'Opcional (10 kΩ pull-down)'],
+          ['Resistencia de base', 'Necesaria (1 kΩ típico)', 'Opcional (10 kΩ pull-down: fija la gate a 0 V)'],
           ['Caída al conductor', 'Vce(sat) ~0.2 V', 'Rds(on) · I (muy baja)'],
           ['Mejor para', 'Cargas pequeñas, barato', 'Cargas grandes, eficiente']
         ]),
-        formula('BJT: Ib ≈ Ic / hFE        (hFE ~100). Para 100 mA → Ib ≈ 1 mA.', ''),
-        apunte('Nivel lógico', 'Si usas un MOSFET con un ESP32 de 3.3 V, comprueba que sea "logic level": que conduzca bien con Vgs=3.3 V. Muchos MOSFETs necesitan 10 V y a mediaconductividad se calientan.'),
+        formula('BJT: Ib ≈ Ic / hFE        (hFE ~100). Para 100 mA → Ib ≈ 1 mA.', 'hFE es la ganancia de corriente del transistor: cuánto amplifica la corriente de base en el colector.'),
+        apunte('Nivel lógico', 'Si usas un MOSFET con un ESP32 de 3.3 V, comprueba que sea "logic level": que conduzca bien con Vgs=3.3 V. Muchos MOSFETs necesitan 10 V en la gate; con solo 3.3 V no conduce del todo y se calienta.'),
         aviso('Siempre pon una resistencia entre la base del BJT y el pin, o una resistencia en la gate del MOSFET (y un pull-down), para evitar estados flotantes.')
       ],
       errors: [err('El transistor se calienta mucho', 'Está en zona activa, no saturation: no le diste suficiente base/gate', 'Aumenta la corriente de base o usa un MOSFET logic-level.')],
@@ -178,7 +180,7 @@ M('b0', 'Orientación y supervivencia', 'Por qué robótica, qué es el trabajo 
           ['Buck-boost', 'Mantiene V con batería baja', 'Más caro', 'Robots con batería']
         ]),
         diagrama('lipo', 'LiPo: celdas y C-rating.'),
-        formula('I máx = C-rating · capacidad(Ah).  Un 2S 2200mAh 30C → 66 A.', ''),
+        formula('I máx = C-rating · capacidad(Ah).  Un 2S 2200mAh 30C → 66 A.', 'El C-rating es la tasa de descarga, expresada en múltiplos de la capacidad: 30C = 30 veces 2.2 Ah = 66 A.'),
         aviso('LiPo: nunca las dejes cargando sin supervisión, nunca las perfores ni las dejes caer por debajo de 3.0 V por celda. Guarda a ~3.8 V/celda si no las vas a usar. Usa siempre un cargador balanceador.'),
         apunte('Brownout', 'Un motor que arranca puede bajar la tensión lo suficiente para resetear tu microcontrolador. Solución: fuente con margen de corriente, capacitor bulk grande (470 µF) y separar la alimentación de motor y lógica con un regulador.'),
         diagrama('brownout', 'La cadena de fallo típica:' + ' ')

@@ -12,6 +12,8 @@ const newDataFiles = [
   'src/data/physical/index.ts',
   'src/data/capstones.ts',
   'src/data/interviews.ts',
+  'src/data/robotics/bridges.ts',
+  'src/data/ai/bridges.ts',
   ...extras
 ];
 const dataFiles = [

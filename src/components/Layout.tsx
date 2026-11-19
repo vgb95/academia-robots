@@ -14,7 +14,7 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   return <nav className="sidebar" onClick={onNavigate}>
     <a className="brand" href={href('/')}><span className="brand-mark">⬢</span><span>Academia<strong>Robótica & IA</strong></span></a>
     <div className="sidebar-section-title">TRACKS</div>
-    {tracks.map(t => <a key={t.id} className={`side-link ${currentTrack?.id === t.id ? 'active' : ''}`} href={href(`/track/${t.id}`)}>
+    {tracks.map(t => <a key={t.id} className={`side-link ${currentTrack?.id === t.id ? 'active' : ''}`} href={href(`/track/${t.id}`)} title={t.title}>
       <span className="side-icon">{t.icon}</span><span>{t.title}</span>
     </a>)}
     {currentTrack && <>
@@ -22,7 +22,7 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
       {currentTrack.modules.map((m, i) => {
         const done = m.lessons.filter(l => state.progress[l.id] === 'done').length;
         const p = Math.round(done / Math.max(1, m.lessons.length) * 100);
-        return <a key={m.id} className="side-link small" href={href(`/track/${currentTrack.id}/${m.id}`)}>
+        return <a key={m.id} className="side-link small" href={href(`/track/${currentTrack.id}/${m.id}`)} title={m.title}>
           <span className="side-num">{String(i).padStart(2, '0')}</span><span className="side-label">{m.title}</span><span className="side-pct">{p}%</span>
         </a>;
       })}
@@ -42,7 +42,7 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
       ['/cases', '⛭', 'Casos reales'], ['/flashcards', '◫', 'Flashcards'],
       ['/troubleshooting', '⚕', 'Diagnóstico'], ['/cheatsheets', '≡', 'Chuletas'],
       ['/offline', '◉', 'Offline e iPad'], ['/notes', '✎', 'Mis notas'], ['/search', '⌕', 'Buscar']
-    ].map(([path, icon, label]) => <a key={path} className="side-link" href={href(path)}><span className="side-icon">{icon}</span><span>{label}</span></a>)}
+    ].map(([path, icon, label]) => <a key={path} className="side-link" href={href(path)} title={label}><span className="side-icon">{icon}</span><span>{label}</span></a>)}
     <div className="sidebar-foot">Hecho para aprenderse a fondo.<br />Offline, en tu iPad.</div>
   </nav>;
 }
@@ -71,15 +71,18 @@ export function Layout({ children }: { children: ReactNode }) {
   }, [route]);
 
   return <div className="app-shell">
-    <aside className={`sidebar-wrap ${open ? 'open' : ''}`}><Sidebar onNavigate={() => setOpen(false)} /></aside>
+    <aside id="app-sidebar" className={`sidebar-wrap ${open ? 'open' : ''}`}><Sidebar onNavigate={() => setOpen(false)} /></aside>
     {open && <div className="scrim" onClick={() => setOpen(false)} />}
     <div className="main-wrap">
       <header className="topbar">
-        <button className="menu-btn" onClick={() => setOpen(o => !o)} aria-label="Abrir menú">☰</button>
+        <button className="menu-btn" onClick={() => setOpen(o => !o)} aria-label={open ? 'Cerrar menú' : 'Abrir menú'} aria-expanded={open} aria-controls="app-sidebar">☰</button>
         <button className="top-title" onClick={() => go('/')}>Academia <span>Robótica & AI Engineer</span></button>
         <div className="topbar-right">
           {!online && <span className="offline-chip">sin conexión · modo offline</span>}
-          {needRefresh && <button className="btn-update" onClick={() => void updateServiceWorker(true)}>Hay una versión nueva · actualizar</button>}
+          {needRefresh && <button className="btn-update" onClick={() => void updateServiceWorker(true)} aria-label="Hay una versión nueva. Actualizar">
+            <span className="update-long">Hay una versión nueva · actualizar</span>
+            <span className="update-short">Actualizar</span>
+          </button>}
           <a className="icon-btn" href={href('/search')} aria-label="Buscar">⌕</a>
           <a className="icon-btn" href={href('/notes')} aria-label="Mis notas">✎</a>
         </div>

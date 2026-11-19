@@ -213,7 +213,7 @@ void loop() { /* leer 'cuentas' con interrupciones desactivadas */ }`, 'Para 200
         'Diseñar un esquema de masa que no mezcle corrientes de motor y de sensor'
       ],
       blocks: [
-        p('La masa no es un sumidero infinito: es un conductor con resistencia e inductancia. Cuando la corriente de retorno del motor atraviesa el mismo tramo de masa que la referencia del sensor, aparece una tensión que se suma a la lectura. Eso es acoplamiento por impedancia común y explica Many lecturas de ADC que "bailan" solo cuando el motor gira.'),
+        p('La masa no es un sumidero infinito: es un conductor con resistencia e inductancia. Cuando la corriente de retorno del motor atraviesa el mismo tramo de masa que la referencia del sensor, aparece una tensión que se suma a la lectura. Eso es acoplamiento por impedancia común y explica las lecturas de ADC que "bailan" solo cuando el motor gira.'),
         formula('V_error = I_ruido · R_compartido + L · dI/dt        R = ρ · L / A', 'Con 2 A y 0.02 Ω compartidos, el error es 40 mV: en un ADC de 12 bits y 3.3 V son 50 cuentas.'),
         p('El bucle de tierra aparece cuando dos puntos de un sistema están unidos a masa por dos caminos distintos, por ejemplo el cable de señal y la tierra de red del osciloscopio. La diferencia de potencial entre ambos puntos hace circular una corriente parásita que se suma a la señal.'),
         diagrama('esquematico', 'Del símbolo al montaje: decide dónde está el único punto de unión de las masas.'),
@@ -400,7 +400,7 @@ with open('informe.json', 'w', encoding='utf-8') as f:
       },
       quiz: [
         q('¿Cuál es la forma correcta de iniciar la puesta en marcha de una placa nueva?', ['Aplicar tensión nominal sin límite de corriente', 'Conectar todos los periféricos y luego encender', 'Fuente con corriente limitada y comprobación de continuidad previa', 'Soldar los conectores con la placa alimentada'], 2, 'La limitación de corriente y la comprobación en frío evitan destruir la placa ante un cortocircuito.'),
-        q('¿Qué hace verificable un informe de fallos?', ['Decir que funciona bien', 'Incluir fecha, revisión, captura y criterio numérico', 'Usar Many fotografías', 'Evitar mencionar el fallo'], 1, 'Sin condición reproducible y umbral numérico, otro no puede confirmar ni refutar el resultado.')
+        q('¿Qué hace verificable un informe de fallos?', ['Decir que funciona bien', 'Incluir fecha, revisión, captura y criterio numérico', 'Usar muchas fotografías', 'Evitar mencionar el fallo'], 1, 'Sin condición reproducible y umbral numérico, otro no puede confirmar ni refutar el resultado.')
       ]
     })
   ]),

@@ -6,10 +6,17 @@ import { href, go } from '../router';
 import { neighborLessons } from '../data/tracks';
 import { PreTest } from './Review';
 import { ExplainPrompt } from './Mastery';
+import { WhySection, BridgeToNext } from './Bridges';
+import { roboticsBridges } from '../data/robotics/bridges';
+import { aiBridges } from '../data/ai/bridges';
+
 
 export function LessonView({ track, module, lesson }: { track: Track; module: Module; lesson: Lesson }) {
   const { state, setProgress, toggleCheck, answerQuiz, setNote, toggleBookmark, setLastLesson } = useStore();
   const [saved, setSaved] = useState(false);
+  // Los bloques interactivos empiezan cerrados: en móvil/iPad el contenido va primero.
+  const [pretestOpen, setPretestOpen] = useState(false);
+  const [explainOpen, setExplainOpen] = useState(false);
   const touchX = useRef<number | null>(null);
   const { prev, next } = neighborLessons(lesson.id);
   const status = state.progress[lesson.id] ?? 'todo';
@@ -72,24 +79,32 @@ export function LessonView({ track, module, lesson }: { track: Track; module: Mo
       <ul>{lesson.objectives.map((o, i) => <li key={i}>{o}</li>)}</ul>
     </div>
 
-    <PreTest lessonId={lesson.id} moduleId={module.id} />
+    {/* El contenido va primero: en pantallas pequeñas el alumno puede leer sin pasar un test. */}
+    <WhySection bridge={roboticsBridges[lesson.id] ?? aiBridges[lesson.id]} />
 
     <BlockRenderer blocks={lesson.blocks} />
 
-    {lesson.practice && <ExplainPrompt
-      lessonId={lesson.id}
-      objectives={lesson.objectives}
-      success={lesson.practice.success}
-    />}
+    <BridgeToNext bridge={roboticsBridges[lesson.id] ?? aiBridges[lesson.id]} />
 
-    {lesson.errors && lesson.errors.length > 0 && <section className="errors-section">
-      <h2 className="section-title">🔧 Errores comunes</h2>
-      <div className="error-grid">{lesson.errors.map((e, i) => <div key={i} className="error-card">
-        <div><span className="error-label">Síntoma</span>{e.symptom}</div>
-        <div><span className="error-label">Causa</span>{e.cause}</div>
-        <div><span className="error-label">Solución</span>{e.fix}</div>
-      </div>)}</div>
-    </section>}
+    <section className="pretest-block">
+      <div className="pretest-summary">
+        <button
+          className="btn btn-ghost pretest-toggle"
+          aria-expanded={pretestOpen}
+          aria-controls="pretest-panel"
+          onClick={() => setPretestOpen(o => !o)}
+        >{pretestOpen ? 'Ocultar preguntas de entrada' : 'Hacer 3 preguntas de entrada →'}</button>
+        {!pretestOpen && <span className="pretest-collapsed muted">Tres preguntas rápidas para activar lo que ya sabes. Puedes hacerlas ahora o más tarde.</span>}
+      </div>
+      <div
+        id="pretest-panel"
+        className="pretest-panel"
+        hidden={!pretestOpen}
+        style={{ display: pretestOpen ? 'block' : 'none' }}
+      >
+        <PreTest lessonId={lesson.id} moduleId={module.id} />
+      </div>
+    </section>
 
     {lesson.practice && <section className="practice-section">
       <h2 className="section-title">🛠️ Práctica</h2>
@@ -104,6 +119,38 @@ export function LessonView({ track, module, lesson }: { track: Track; module: Mo
         })}
       </div>
       <div className="practice-progress">{doneCount} / {lesson.practice.success.length} criterios cumplidos</div>
+    </section>}
+
+    {lesson.practice && <section className="explain-block">
+      <div className="explain-summary">
+        <button
+          className="btn btn-ghost explain-toggle"
+          aria-expanded={explainOpen}
+          aria-controls="explain-panel"
+          onClick={() => setExplainOpen(o => !o)}
+        >{explainOpen ? 'Ocultar ejercicio de explicación' : 'Explicar sin mirar'}</button>
+      </div>
+      <div
+        id="explain-panel"
+        className="explain-panel"
+        hidden={!explainOpen}
+        style={{ display: explainOpen ? 'block' : 'none' }}
+      >
+        <ExplainPrompt
+          lessonId={lesson.id}
+          objectives={lesson.objectives}
+          success={lesson.practice.success}
+        />
+      </div>
+    </section>}
+
+    {lesson.errors && lesson.errors.length > 0 && <section className="errors-section">
+      <h2 className="section-title">🔧 Errores comunes</h2>
+      <div className="error-grid">{lesson.errors.map((e, i) => <div key={i} className="error-card">
+        <div><span className="error-label">Síntoma</span>{e.symptom}</div>
+        <div><span className="error-label">Causa</span>{e.cause}</div>
+        <div><span className="error-label">Solución</span>{e.fix}</div>
+      </div>)}</div>
     </section>}
 
     {lesson.quiz && lesson.quiz.length > 0 && <section className="quiz-section">

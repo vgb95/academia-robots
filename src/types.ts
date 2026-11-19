@@ -84,6 +84,14 @@ export type InterviewQuestion = {
   signal: string;
 };
 
+export type LessonBridge = {
+  why: string;          // por qué existe este tema, qué problema resuelve
+  from: string;         // cómo se conecta con lo anterior
+  to: string;           // qué pregunta queda abierta y cómo la responde la siguiente lección
+  analogy?: string;     // analogía concreta y comprobable
+  extraBlocks?: ContentBlock[]; // profundización adicional (2-5 bloques)
+};
+
 export type Capstone = {
   id: string;
   track: 'robotica' | 'ai';
