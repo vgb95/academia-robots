@@ -7,6 +7,7 @@ import { neighborLessons } from '../data/tracks';
 import { PreTest } from './Review';
 import { ExplainPrompt } from './Mastery';
 import { WhySection, BridgeToNext } from './Bridges';
+import { electronicsDeep } from '../data/robotics/electronicsDeep';
 import { roboticsBridges } from '../data/robotics/bridges';
 import { aiBridges } from '../data/ai/bridges';
 
@@ -83,6 +84,12 @@ export function LessonView({ track, module, lesson }: { track: Track; module: Mo
     <WhySection bridge={roboticsBridges[lesson.id] ?? aiBridges[lesson.id]} />
 
     <BlockRenderer blocks={lesson.blocks} />
+
+    {electronicsDeep[lesson.id]?.extraBlocks && <>
+      <div className="section-title">Tratado de estudio · {lesson.title}</div>
+      <p className="muted">Desarrollo completo: teoría, derivaciones, ejemplos numéricos, errores típicos y checklist de banco. Léelo con el multímetro al lado.</p>
+      <BlockRenderer blocks={electronicsDeep[lesson.id].extraBlocks!} />
+    </>}
 
     <BridgeToNext bridge={roboticsBridges[lesson.id] ?? aiBridges[lesson.id]} />
 

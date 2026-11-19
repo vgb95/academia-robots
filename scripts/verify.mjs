@@ -5,6 +5,7 @@ import { join } from 'node:path';
 const read = p => readFileSync(p, 'utf8');
 const src = 'src';
 const extras = readdirSync('src/data/extras').filter(f => f.endsWith('.ts')).map(f => `src/data/extras/${f}`);
+const electronics = readdirSync('src/data/robotics/electronics').filter(f => f.endsWith('.ts')).map(f => `src/data/robotics/electronics/${f}`);
 // Archivos de datos nuevos (bloques avanzados, Physical AI y banco de evaluación).
 const newDataFiles = [
   'src/data/robotics/advanced.ts',
@@ -14,6 +15,9 @@ const newDataFiles = [
   'src/data/interviews.ts',
   'src/data/robotics/bridges.ts',
   'src/data/ai/bridges.ts',
+  'src/data/robotics/electronicsDeep.ts',
+  'src/data/diagrams-electronics.ts',
+  ...electronics,
   ...extras
 ];
 const dataFiles = [
@@ -35,7 +39,7 @@ if (dup.length) fail('IDs de lección duplicados: ' + [...new Set(dup)].join(', 
 else ok(`${lessonIds.length} lecciones con IDs únicos`);
 
 // Diagramas
-const diagramSrc = read('src/data/diagrams.ts');
+const diagramSrc = read('src/data/diagrams.ts') + read('src/data/diagrams-electronics.ts');
 const defined = new Set([...diagramSrc.matchAll(/^  ([a-z0-9_]+): \(\) =>/gm)].map(m => m[1]));
 const used = new Set([...all.matchAll(/diagrama\('([a-z0-9_]+)'/g)].map(m => m[1]));
 const missingDiagrams = [...used].filter(x => !defined.has(x));

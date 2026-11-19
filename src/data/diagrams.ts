@@ -579,8 +579,10 @@ function pasosSvg(title: string, items: string[][]): string {
   return wrap(defs + s, 760, 52 + items.length * 56 + 16);
 }
 
+import { electronicsDiagrams } from './diagrams-electronics';
+
 export function getDiagram(name: string): string | null {
-  const fn = D[name];
+  const fn = D[name] ?? electronicsDiagrams[name];
   if (fn) return fn();
   // Fallback: diagrama genérico para nombres no registrados.
   return wrap(defs + text(380, 130, name.replace(/_/g, ' '), 20, '#F2F1ED', 'middle', 700) +
