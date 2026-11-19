@@ -305,7 +305,7 @@ export const aiBridges: Record<string, LessonBridge> = {
     why: "SFT enseña formato; la alineación enseña preferencias. RLHF entrena un reward model con comparaciones humanas y optimiza con PPO, mientras DPO salta el reward model y optimiza directamente sobre pares chosen y rejected. El cuello de botella no es el algoritmo sino el dataset de preferencias: qué se considera mejor y por qué. Sin monitorizar la KL, DPO puede degradar la calidad general.",
     from: "Viene de 'LoRA y QLoRA: ajuste eficiente': cuando el formato ya está resuelto, el siguiente salto de calidad es comportamental, no de parámetros.",
     to: "Alineado el modelo, queda la interfaz con el usuario. 'Prompting y structured output' convierte instrucciones y esquemas en algo que tu código puede consumir sin parsear texto a mano.",
-    analogy: "Es la diferencia entre enseñar a alguien a rellar un formulario y enseñarle a elegir la respuesta que un cliente preferiría leer; la segunda necesita comparaciones, no ejemplos correctos."
+    analogy: "Es la diferencia entre enseñar a alguien a rellenar un formulario y enseñarle a elegir la respuesta que un cliente preferiría leer; la segunda necesita comparaciones, no ejemplos correctos."
   },
   'a4-6': {
     why: "El prompt es código: se versiona, se testea y se despliega, porque un cambio de una palabra altera el comportamiento y hay que poder compararlo y hacer rollback. Un buen prompt define rol, contexto, formato, ejemplos y restricciones, y deja poco a la interpretación. Los structured outputs restringen la decodificación a un esquema JSON válido y eliminan el parseo manual de texto.",
@@ -409,7 +409,7 @@ export const aiBridges: Record<string, LessonBridge> = {
     to: "Cuando la respuesta correcta no es única —resúmenes, tono, utilidad— hace falta un juez. 'LLM-as-judge y benchmarks' escala la evaluación y advierte de sus sesgos.",
     analogy: "Es un banco de pruebas con muestras congeladas: cambias el motor, lo vuelves a pasar por el banco y comparas; sin muestras fijas solo tienes opiniones.",
     extraBlocks: [
-      { type: "formula", expr: "SE ≈ s/√n   →   para halvar el error estándar hacen falta 4× casos", explain: "Pasar de 100 a 400 casos reduce el SE a la mitad: por eso una mejora del 3% sobre 50 preguntas no es evidencia, es ruido." },
+      { type: "formula", expr: "SE ≈ s/√n   →   para reducir a la mitad el error estándar hacen falta 4× casos", explain: "Pasar de 100 a 400 casos reduce el SE a la mitad: por eso una mejora del 3% sobre 50 preguntas no es evidencia, es ruido." },
       { type: "tabla", headers: ["Nivel", "Pregunta", "Cuándo te avisa"], rows: [["Componente", "¿Trajo el trozo correcto?", "Antes de culpar al prompt"], ["End-to-end", "¿Fue correcta la respuesta?", "Antes de publicar"]] },
       { type: "apunte", title: "Matiz:", text: "Reporta por segmento. Un 95% global puede esconder un 40% en español o en preguntas numéricas; estratifica por idioma, dificultad y categoría desde el primer dataset." }
     ]

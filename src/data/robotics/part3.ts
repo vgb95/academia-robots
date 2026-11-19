@@ -1415,10 +1415,34 @@ print(f"éxito={p:.0%}, IC95%=[{ci[0]:.0%}, {ci[1]:.0%}]")`, 'Tasa de éxito con
       id: 'r11-5', title: 'Especialidad: percepción y visión', min: 11,
       objectives: ['Conocer el día a día de percepción', 'Saber qué profundizar'],
       blocks: [
+        h('Por qué existe la percepción'),
+        p('Ningún controlador puede corregir un objeto que no sabe dónde está. Esta especialidad existe porque los sensores no entregan el mundo: entregan píxeles con ruido, nubes de puntos desalineadas y oclusiones. Percepción es la única capa que decide qué es real y qué es ruido, y la que convierte una señal en poses y etiquetas dentro del marco de referencia del robot.'),
         p('Quien hace percepción responde a una pregunta: ¿qué hay y dónde está? El trabajo real pasa menos tiempo entrenando modelos y más tiempo con cámaras mal iluminadas, lentes desenfocadas y nubes de puntos desalineadas.'),
         lista(['Cimientos: geometría proyectiva, calibración, transformadas y álgebra lineal.', 'Herramientas: OpenCV, PCL/Open3D, ROS 2 (image_transport, tf2), PyTorch.', 'Tareas: detección 2D/3D, segmentación, odometría visual, SLAM, fusión lidar-cámara.', 'Métrica típica: IoU, mAP, error de reproyección, error de traslación/rotación.']),
-        apunte('Consejo de especialista', 'La calibración es la mitad del trabajo. Un modelo espectacular con una cámara mal calibrada da peores resultados que un método clásico con buenos intrínsecos. Aprende a medir el error de reproyección.')
+        p('Un número para dimensionar el problema: con f = 700 px y un objeto a 2 m, un error de 2 px en el centro de la imagen equivale a ΔZ ≈ Z·Δp/f = 2000·2/700 ≈ 5,7 mm de profundidad. Por eso un RMS de reproyección de 0,3 px es aceptable y 2,5 px no. Una cámara RGB-D tipo RealSense D435 ronda los 350 USD y entrega nubes a 30 fps.'),
+        tabla(['Enfoque', 'Qué entrega', 'Fortaleza', 'Límite'], [
+          ['Visión clásica (OpenCV)', 'Blobs, bordes y esquinas calibradas', 'Barato, determinista y explicable', 'Falla con luz cambiante y texturas pobres'],
+          ['Detector neuronal (YOLO, Mask R-CNN)', 'Cajas y máscaras por clase', 'Robusto en escenas complejas', 'Exige GPU y añade 20–50 ms de latencia'],
+          ['RGB-D / estereo', 'Nube de puntos con profundidad', 'Profundidad directa sin mover la cámara', 'El ruido crece con Z² y sufre con sol directo']
+        ]),
+        apunte('Consejo de especialista', 'La calibración es la mitad del trabajo. Un modelo espectacular con una cámara mal calibrada da peores resultados que un método clásico con buenos intrínsecos. Aprende a medir el error de reproyección.'),
+        aviso('El error típico es calibrar una vez y olvidar: un golpe a la cámara o un cambio de enfoque invalida los intrínsecos. Si la reproyección sube de 1 px, recalibra antes de culpar al detector, y no mezcles distorsión sin corregir con estimación de pose.'),
+        codigo('python', `import cv2, numpy as np, glob
+obj = np.zeros((6*9, 3), np.float32)
+obj[:, :2] = np.mgrid[0:9, 0:6].T.reshape(-1, 2)
+pts3d, pts2d = [], []
+for f in glob.glob("cal/*.png"):
+    gray = cv2.imread(f, cv2.IMREAD_GRAYSCALE)
+    ok, corners = cv2.findChessboardCorners(gray, (9, 6), None)
+    if ok:
+        pts3d.append(obj)
+        pts2d.append(cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1),
+            (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)))
+ret, K, dist, rvecs, tvecs = cv2.calibrateCamera(pts3d, pts2d, gray.shape[::-1], None, None)
+print("RMS de reproyección:", round(ret, 3), "px")`, 'Calibración de cámara con OpenCV y chequeo del RMS.'),
+        enlace('https://docs.ros.org/en/humble/Tutorials/Intermediate/Tf2/Tf2-Main.html', 'ROS 2: tf2', 'Documentación oficial de marcos de referencia; imprescindible para pasar de píxel a metro.')
       ],
+      errors: [err('La detección falla en cuanto cambia la luz', 'Umbral fijo calibrado en otra sala o intrínsecos desactualizados', 'Recalibra y comprueba el RMS de reproyección; usa umbral adaptativo u Otsu.')],
       practice: { task: 'Calibra una cámara con unas 20 fotos de un tablero de ajedrez, guarda los intrínsecos y comprueba que el error de reproyección sea menor de 1 píxel.', success: ['RMS de reproyección < 1 px', 'Intrínsecos guardados', 'Explicas qué mide esa métrica'] },
       quiz: [q('¿Cuál de estas es una métrica típica de percepción según la lección?', ['Overshoot', 'Error de reproyección', 'Jerk', 'Tiempo de establecimiento'], 1, 'En percepción se usan IoU, mAP, error de reproyección y error de traslación/rotación; las otras son métricas de control.')]
     }),
@@ -1426,10 +1450,37 @@ print(f"éxito={p:.0%}, IC95%=[{ci[0]:.0%}, {ci[1]:.0%}]")`, 'Tasa de éxito con
       id: 'r11-6', title: 'Especialidad: control y estimación', min: 11,
       objectives: ['Conocer el día a día de control', 'Saber qué profundizar'],
       blocks: [
+        h('Por qué existen control y estimación'),
+        p('En un lazo real el estado nunca está completo: el encoder da posición, el IMU aceleración con sesgo y el GPS llega a 10 Hz. Ninguna capa inferior entrega la velocidad y la orientación que el controlador necesita. Esta especialidad existe para reconstruir ese estado a partir de señales parciales y ruidosas; sin estimación, incluso la ley de control mejor diseñada persigue un objetivo equivocado.'),
         p('Control y estimación son caras opuestas de la misma moneda: control decide qué hacer; estimación decide qué está pasando. Sin una buena estimación, el mejor controlador persigue un estado equivocado.'),
-        lista(['Cimientos: PID, espacio de estados, Kalman, LQR, MPC, análisis en frecuencia.', 'Herramientas: Python/NumPy, MATLAB/Simulink, ros2_control, Control Toolbox.', 'Tareas: lazos de velocidad y posición, fusión IMU-GPS, balanceo, control de fuerza.', 'Métrica típica: tiempo de establecimiento, overshoot, error steady-state, consumo energético.']),
-        apunte('Por dónde empezar', 'No intentes derivar la dinámica de un humanoide. Empieza por un motor con encoder y un péndulo invertido: son suficientes para entender el 80% de los problemas que aparecen después.')
+        lista(['Cimientos: PID, espacio de estados, Kalman, LQR, MPC, análisis en frecuencia.', 'Herramientas: Python/NumPy, MATLAB/Simulink, ros2_control, Control Toolbox.', 'Tareas: lazos de velocidad y posición, fusión IMU-GPS, balanceo, control de fuerza.', 'Métrica típica: tiempo de establecimiento, overshoot, error estacionario, consumo energético.']),
+        p('Un lazo a 1 kHz deja 1 ms por ciclo para medir, estimar y actuar. Si el filtro tarda 300 µs y la lectura llega con 200 µs de retardo, ya gastaste la mitad del presupuesto y el margen de fase se erosiona. Un encoder de 1024 pulsos por vuelta a 3000 rpm entrega 51.200 pulsos/s: derivar esa señal sin filtrar amplifica la cuantización.'),
+        tabla(['Método', 'Entradas', 'Ventaja', 'Coste o límite'], [
+          ['Filtro complementario', 'IMU + encoder', 'Unas líneas y sin modelo', 'Pesos fijos: no óptimo si cambia la dinámica'],
+          ['Kalman (EKF)', 'IMU + encoder + GPS', 'Óptimo con ruido gaussiano y modelo lineal', 'Exige matrices Q y R; 0,1–1 ms por paso'],
+          ['Observador de Luenberger', 'Modelo + salidas medidas', 'Simple y determinista', 'Sensible a errores del modelo']
+        ]),
+        apunte('Por dónde empezar', 'No intentes derivar la dinámica de un humanoide. Empieza por un motor con encoder y un péndulo invertido: son suficientes para entender el 80% de los problemas que aparecen después.'),
+        aviso('Derivar la posición del encoder para obtener velocidad es el error clásico: el ruido de cuantización se amplifica y el término D del PID empieza a temblar. Filtra con un paso bajo o usa un observador, y nunca confíes en un IMU sin corregir el sesgo del giroscopio.'),
+        codigo('python', `import numpy as np
+# Kalman 1D: estimar posicion y velocidad desde una medicion ruidosa
+dt = 0.001  # 1 kHz
+A = np.array([[1.0, dt], [0.0, 1.0]])
+H = np.array([[1.0, 0.0]])
+Q = np.diag([1e-6, 1e-4])   # ruido de proceso
+R = np.array([[1e-4]])      # ruido del encoder
+x = np.zeros((2, 1)); P = np.eye(2)
+for z in mediciones:         # z = posicion medida
+    x = A @ x
+    P = A @ P @ A.T + Q
+    y = z - H @ x            # innovacion
+    S = H @ P @ H.T + R
+    K = P @ H.T @ np.linalg.inv(S)
+    x = x + K * y
+    P = (np.eye(2) - K @ H) @ P`, 'Paso de Kalman para fusión de encoder e IMU a 1 kHz.'),
+        enlace('https://control.ros.org/humble/index.html', 'ros2_control', 'Documentación oficial del framework de control de ROS 2: controladores, interfaces de hardware y tiempo real.')
       ],
+      errors: [err('El controlador oscila al añadir estimación de velocidad', 'Velocidad derivada de un encoder ruidoso alimenta el término D', 'Filtra la derivada o sustituye el diferenciador por un observador.')],
       practice: { task: 'Sintoniza un PID sobre un motor con encoder y mide tiempo de establecimiento, overshoot y error estacionario. Después explica qué pasaría si el encoder diera una lectura sesgada.', success: ['Mides al menos tres métricas', 'Identificas el papel de la estimación', 'Explicas la consecuencia del sensor sesgado'] },
       quiz: [q('¿Qué diferencia a control y estimación según la lección?', ['Control mide y estimación actúa', 'Control decide qué hacer; estimación decide qué está pasando', 'Son la misma disciplina con otro nombre', 'La estimación solo usa cámaras'], 1, 'El texto las describe como caras opuestas: el control decide la acción y la estimación infiere el estado.')]
     }),
@@ -1437,21 +1488,51 @@ print(f"éxito={p:.0%}, IC95%=[{ci[0]:.0%}, {ci[1]:.0%}]")`, 'Tasa de éxito con
       id: 'r11-7', title: 'Especialidad: manipulación y planificación', min: 11,
       objectives: ['Conocer el día a día de manipulación', 'Saber qué profundizar'],
       blocks: [
+        h('Por qué existe la manipulación'),
+        p('Llegar y agarrar no es solo cinemática: el mundo real tiene contactos, holguras y errores de modelo. Esta especialidad existe porque ni el control ni la percepción deciden qué dedo toca qué superficie ni con cuánta fuerza. Eso exige planificar en el espacio de configuraciones, evitar colisiones y gestionar el contacto con el entorno.'),
         p('Manipulación es el problema de llegar y agarrar sin romper nada. Combina cinemática, planificación con colisiones, control de fuerza y, cada vez más, políticas aprendidas.'),
-        lista(['Cimientos: cinemática directa e inversa, Jacobiano, planning, grasp synthesis.', 'Herramientas: MoveIt 2, OMPL, Drake, Robotics Toolbox, Isaac Sim.', 'Tareas: pick and place, ensamblaje, teleoperación, diseño de pinzas.', 'Métrica típica: tasa de éxito, tiempo por ciclo, fuerza de agarre, slap/backlash.']),
-        apunte('La partly subestimada', 'Diseñar el dedo de una pinza puede mejorar más la tasa de éxito que cambiar el modelo. La mecánica y el modelado también son parte de la solución.')
+        lista(['Cimientos: cinemática directa e inversa, Jacobiano, planificación, síntesis de agarre.', 'Herramientas: MoveIt 2, OMPL, Drake, Robotics Toolbox, Isaac Sim.', 'Tareas: recoger y colocar, ensamblaje, teleoperación, diseño de pinzas.', 'Métrica típica: tasa de éxito, tiempo por ciclo, fuerza de agarre, holgura mecánica.']),
+        p('Un UR5e nuevo ronda los 35.000–40.000 USD y repite con ±0,1 mm, pero un ciclo real de recoger y colocar baja de unos 8 s a 3,5 s solo con eliminar esperas y suavizar la trayectoria. La diferencia entre 92% y 99% de tasa de éxito separa un prototipo de una celda en producción: en 1000 ciclos son 80 fallos frente a 10.'),
+        tabla(['Pinza', 'Fuerza típica', 'Ideal para', 'Límite'], [
+          ['Paralela mecánica', '20–100 N', 'Piezas rígidas y repetibles', 'Hay que diseñar el dedo para cada pieza'],
+          ['Ventosa neumática', '5–50 N', 'Superficies planas y lisas', 'Falla con porosidad, polvo o succión insuficiente'],
+          ['Pinza blanda o adhesiva', '1–20 N', 'Objetos frágiles e irregulares', 'Menos precisión y mayor desgaste']
+        ]),
+        apunte('La parte subestimada', 'Diseñar el dedo de una pinza puede mejorar más la tasa de éxito que cambiar el modelo. La mecánica y el modelado también son parte de la solución.'),
+        aviso('Planificar con el modelo del brazo pero sin incluir la pinza en la geometría de colisión es el fallo típico: el plan es válido para el robot y la pinza choca contra la mesa. Añade siempre el efector a la escena de planificación (planning scene) y verifica la orientación del agarre, no solo la posición.'),
+        pasos([
+          { title: '1. Arranca el entorno', text: 'ros2 launch moveit2_tutorials demo.launch.py y abre RViz con el complemento de planificación de movimiento.' },
+          { title: '2. Publica el obstáculo', text: 'Añade una mesa como objeto de colisión en la escena de planificación y comprueba que aparece resaltada en RViz.' },
+          { title: '3. Planifica y ejecuta', text: 'Mueve el objetivo a la pose de agarre, pulsa Plan y luego Execute; repite 10 veces.' },
+          { title: '4. Mide', text: 'Cronometra el ciclo y cuenta aciertos; si falla, revisa primero la pinza y los límites articulares.' }
+        ]),
+        enlace('https://moveit.picknik.ai/main/index.html', 'MoveIt 2', 'Documentación oficial: planificación de movimiento, escena de planificación y control de brazos en ROS 2.')
       ],
-      practice: { task: 'Configura una escena en MoveIt 2 con un obstáculo, planifica un pick and place y registra tasa de éxito y tiempo por ciclo durante 10 repeticiones.', success: ['Planificas sin colisiones', 'Mides éxito y tiempo de ciclo', 'Documentas la pinza utilizada'] },
-      quiz: [q('¿Cuál es una métrica típica de manipulación según la lección?', ['mAP', 'Tasa de éxito', 'Margen de fase', 'Consumo de GPU'], 1, 'En manipulación se miden tasa de éxito, tiempo por ciclo, fuerza de agarre y slap/backlash.')]
+      errors: [err('El plan es válido pero la pinza choca', 'El efector no está incluido en la geometría de colisión', 'Añade la pinza a la escena de planificación y valida la orientación del agarre.')],
+      practice: { task: 'Configura una escena en MoveIt 2 con un obstáculo, planifica una tarea de recoger y colocar y registra tasa de éxito y tiempo por ciclo durante 10 repeticiones.', success: ['Planificas sin colisiones', 'Mides éxito y tiempo de ciclo', 'Documentas la pinza utilizada'] },
+      quiz: [q('¿Cuál es una métrica típica de manipulación según la lección?', ['mAP', 'Tasa de éxito', 'Margen de fase', 'Consumo de GPU'], 1, 'En manipulación se miden tasa de éxito, tiempo por ciclo, fuerza de agarre y holgura mecánica.')]
     }),
     L({
       id: 'r11-8', title: 'Especialidad: robot learning', min: 12,
       objectives: ['Conocer el día a día de robot learning', 'Saber qué profundizar'],
       blocks: [
+        h('Por qué existe robot learning'),
+        p('Programar a mano una regla para cada objeto y cada iluminación no escala. Esta especialidad existe porque ni el control clásico ni la percepción resuelven la variación infinita de escenas y objetos: una política aprendida generaliza donde un conjunto de reglas se agota, a cambio de exigir datos físicos y una evaluación honesta.'),
         p('Robot learning sustituye código manual por datos: muestras demostraciones o dejas que el agente explore y obtienes una política. Es la capa que está creciendo más rápido y la que más datos físicos necesita.'),
-        lista(['Cimientos: imitation learning, RL, transformers, difusión, sim-to-real.', 'Herramientas: LeRobot, PyTorch, MuJoCo, Isaac Lab, Hugging Face Hub.', 'Tareas: recolección de demostraciones, entrenamiento de ACT/diffusion, evaluación con vídeos.', 'Métrica típica: tasa de éxito con intervalo de confianza y generalización.']),
-        apunte('El cuello de botella', 'No es el modelo: son los datos y la evaluación. Saber diseñar un protocolo de evaluación honesto y grabar demostraciones limpias es lo que diferencia a alguien que entrena policies de alguien que publica números creíbles.')
+        lista(['Cimientos: aprendizaje por imitación, RL, transformers, difusión, sim-to-real.', 'Herramientas: LeRobot, PyTorch, MuJoCo, Isaac Lab, Hugging Face Hub.', 'Tareas: recolección de demostraciones, entrenamiento de ACT o diffusion policy, evaluación con vídeos.', 'Métrica típica: tasa de éxito con intervalo de confianza y generalización.']),
+        p('50 demostraciones de 8 s a 30 fps son 12.000 frames y unos 20 minutos de grabación; con una política tipo ACT se entrenan en horas en una sola GPU. Si evalúas 20 episodios y aciertas 14, la tasa es 70% con IC95% aproximado de [46%, 87%]: un 82% sin intervalo y sin escenario nuevo no dice casi nada.'),
+        tabla(['Enfoque', 'Señal de entrenamiento', 'Datos típicos', 'Cuándo conviene'], [
+          ['Behavior cloning / ACT', 'Demostraciones de un experto', '50–200 episodios', 'Tareas de destreza con teleoperación'],
+          ['Diffusion policy', 'Demostraciones con ruido iterativo', '50–300 episodios', 'Acciones multimodales y secuencias suaves'],
+          ['RL en simulación y sim-to-real', 'Recompensa', 'Millones de pasos simulados', 'Cuando grabar es caro y hay buen simulador']
+        ]),
+        apunte('El cuello de botella', 'No es el modelo: son los datos y la evaluación. Saber diseñar un protocolo de evaluación honesto y grabar demostraciones limpias es lo que diferencia a alguien que entrena políticas de alguien que publica números creíbles.'),
+        aviso('Evaluar siempre en las mismas condiciones de grabación es el error más común: la política memoriza la iluminación y la posición inicial. Cambia objeto, luz y cámara en el protocolo de evaluación y graba vídeos de los fallos; sin eso publicarás un número que no sobrevive al día siguiente.'),
+        codigo('bash', `python lerobot/scripts/control_robot.py record --robot-config config/robot.py --output data/tarea --num-episodes 10 --fps 30 --warmup-time-s 2
+python lerobot/scripts/train.py --config config/act.py --dataset data/tarea --output outputs/act_tarea`, 'Grabar demostraciones y entrenar una política ACT con LeRobot.'),
+        enlace('https://huggingface.co/docs/lerobot/index', 'LeRobot', 'Documentación oficial de Hugging Face: grabación de demostraciones, políticas ACT y diffusion.')
       ],
+      errors: [err('La política funciona al grabar pero falla en evaluación', 'Protocolo de eval con las mismas condiciones del entrenamiento', 'Cambia objeto, luz y cámara, y reporta tasa con IC sobre 20 episodios.')],
       practice: { task: 'Graba 10 demostraciones limpias de una tarea, entrena una política y evalúa 20 episodios reportando tasa de éxito con intervalo de confianza y un escenario nuevo.', success: ['Demos sin saltos ni frames corruptos', 'Evalúas en el robot real', 'Reportas IC y generalización'] },
       quiz: [q('Según la lección, ¿cuál es el cuello de botella en robot learning?', ['El modelo', 'Los datos y la evaluación', 'La GPU', 'El lenguaje de programación'], 1, 'El apunte insiste: no es el modelo, son los datos y un protocolo de evaluación honesto.')]
     }),
@@ -1459,10 +1540,39 @@ print(f"éxito={p:.0%}, IC95%=[{ci[0]:.0%}, {ci[1]:.0%}]")`, 'Tasa de éxito con
       id: 'r11-9', title: 'Especialidad: embedded y firmware', min: 11,
       objectives: ['Conocer el día a día de firmware', 'Saber qué profundizar'],
       blocks: [
-        p('Firmware es donde el código toca el metal: PWM, timers, DMA, interrupciones y buses. Es la capa que decide si tu control a 1 kHz es real o solo una idea en un paper.'),
-        lista(['Cimientos: C/C++, arquitectura ARM, RTOS, poseo PWM, ADC, DMA, protocolos.', 'Herramientas: ESP-IDF, STM32Cube, PlatformIO, oscilloscope, logic analyzer.', 'Tareas: drivers de motor y sensor, bootloader, OTA, telemetría, timing determinista.', 'Métrica típica: jitter, latencia de interrupción, consumo, fiabilidad.']),
-        apunte('El consejo', 'Compra un osciloscopio o un analizador lógico barato. Ver una señal I²C o un PWM en vivo te ahorrará semanas de conjeturas.')
+        h('Por qué existe firmware'),
+        p('El código de aplicación asume muestreo regular y órdenes que llegan a tiempo; el hardware no garantiza ninguna de las dos. Ni la planificación ni la percepción pueden fijar cuándo se muestrea un sensor o se actualiza un PWM: solo el firmware convierte ese requisito en capturas de timer, interrupciones y transferencias DMA. Sin esta capa, la frecuencia de control del enunciado nunca llega al motor.'),
+        p('Firmware es donde el código toca el metal: PWM, timers, DMA, interrupciones y buses. Es la capa que decide si tu control a 1 kHz es real o solo una idea en un artículo.'),
+        lista(['Cimientos: C/C++, arquitectura ARM, RTOS, PWM, ADC, DMA, protocolos.', 'Herramientas: ESP-IDF, STM32Cube, PlatformIO, osciloscopio, analizador lógico.', 'Tareas: drivers de motor y sensor, bootloader, OTA, telemetría, temporización determinista.', 'Métrica típica: jitter, latencia de interrupción, consumo, fiabilidad.']),
+        p('Un lazo a 1 kHz deja 1 ms por ciclo: un jitter de 50 µs ya es el 5% del periodo y come margen de fase. Un STM32F4 a 168 MHz mueve el ADC a 1 MSPS mediante DMA sin cargar la CPU, y un PWM de 12 bits a 20 kHz queda por encima del rango audible. Como referencia de coste, una Nucleo-F446 ronda los 15–20 USD y un osciloscopio de banco como el DS1054Z unos 400 USD.'),
+        tabla(['Técnica', 'Cómo espera el dato', 'Latencia y CPU', 'Uso típico'], [
+          ['Polling', 'El bucle consulta el indicador de estado', 'CPU al 100%, latencia impredecible', 'Depuración y sensores lentos'],
+          ['Interrupción (ISR)', 'El periférico avisa', 'Baja latencia, ISR muy corta', 'Encoder y captura de tiempo'],
+          ['DMA', 'El periférico escribe directo en memoria', 'Casi cero CPU, ráfaga continua', 'ADC a 1 MSPS, I²S, SPI']
+        ]),
+        apunte('El consejo', 'Compra un osciloscopio o un analizador lógico barato. Ver una señal I²C o un PWM en vivo te ahorrará semanas de conjeturas.'),
+        aviso('Compartir una variable entre una ISR y una tarea sin declararla volatile ni proteger la sección crítica produce lecturas a medias: el compilador optimiza la variable y el valor cambia durante la lectura. Tampoco imprimas por serial dentro de una ISR: bloquea el cierre del lazo y dispara el watchdog.'),
+        codigo('cpp', `#include <driver/ledc.h>
+// PWM de 20 kHz y 12 bits en GPIO25 con ESP-IDF
+ledc_timer_config_t timer = {
+    .speed_mode = LEDC_LOW_SPEED_MODE,
+    .duty_resolution = LEDC_TIMER_12_BIT,
+    .timer_num = LEDC_TIMER_0,
+    .freq_hz = 20000,
+    .clk_cfg = LEDC_AUTO_CLK
+};
+ledc_timer_config(&timer);
+ledc_channel_config_t ch = {
+    .gpio_num = 25,
+    .speed_mode = LEDC_LOW_SPEED_MODE,
+    .channel = LEDC_CHANNEL_0,
+    .timer_sel = LEDC_TIMER_0,
+    .duty = 2048            // 50% de 4096
+};
+ledc_channel_config(&ch);`, 'Configurar un PWM de 20 kHz con ESP-IDF.'),
+        enlace('https://docs.espressif.com/projects/esp-idf/en/latest/esp32/', 'ESP-IDF', 'Documentación oficial de Espressif: timers, LEDC/PWM, DMA y FreeRTOS en ESP32.')
       ],
+      errors: [err('El PWM se ve bien en código pero el motor vibra', 'Jitter de temporización o frecuencia por debajo del rango audible', 'Mide la señal con el osciloscopio y sube la frecuencia por encima de 20 kHz.')],
       practice: { task: 'Genera un PWM con un timer de tu microcontrolador y mídelo con un osciloscopio o analizador lógico; registra frecuencia, ciclo de trabajo y jitter.', success: ['Señal medida en vivo', 'Jitter cuantificado', 'Explicas la diferencia entre el código y lo observado'] },
       quiz: [q('¿Qué herramienta recomienda la lección para depurar señales I²C o PWM?', ['Un multímetro', 'Un osciloscopio o analizador lógico', 'Un log de ROS 2', 'Un simulador de red'], 1, 'El apunte aconseja comprar un osciloscopio o analizador lógico barato y ver la señal en vivo.')]
     }),
@@ -1470,10 +1580,27 @@ print(f"éxito={p:.0%}, IC95%=[{ci[0]:.0%}, {ci[1]:.0%}]")`, 'Tasa de éxito con
       id: 'r11-10', title: 'Especialidad: simulación y sistemas', min: 11,
       objectives: ['Conocer el día a día de simulación e integración', 'Saber qué profundizar'],
       blocks: [
+        h('Por qué existen simulación e integración'),
+        p('Probar un controlador nuevo directamente en el robot rompe hardware y no es reproducible: dos ejecuciones con la misma luz y la misma batería rara vez coinciden. La simulación existe para entrenar y validar sin coste físico; la integración existe para que percepción, control y planificación convivan en un robot real con temporización y redes. Es la capa donde una idea se convierte en sistema.'),
         p('La simulación permite entrenar y validar sin romper hardware; la integración hace que todos los subsistemas convivan en un robot real. Son dos caras de la misma moneda y probablemente tu mejor entrada si vienes de SWE.'),
-        lista(['Cimientos: URDF/SDF, ros2_control, Gazebo/MuJoCo/Isaac, tf2, Docker, redes.', 'Herramientas: ROS 2, Gazebo, MoveIt, Nav2, CI, rosbag.', 'Tareas: modelar robots, sim-to-real, pipelines de datos, testing, despliegue en flota.', 'Métrica típica: fidelidad de simulación, tiempo de arranque, reproducibilidad.']),
-        apunte('Por qué es una buena entrada', 'Tu experiencia con sistemas, contenedores, CI y código limpio es directamente transferible. Solo necesitas añadir el vocabulario físico: marcos, inercias, contactos y temporización.')
+        lista(['Cimientos: URDF/SDF, ros2_control, Gazebo/MuJoCo/Isaac, tf2, Docker, redes.', 'Herramientas: ROS 2, Gazebo, MoveIt, Nav2, CI, rosbag.', 'Tareas: modelar robots, sim-to-real, pipelines de datos, pruebas, despliegue en flota.', 'Métrica típica: fidelidad de simulación, tiempo de arranque, reproducibilidad.']),
+        p('Un rosbag de 3 minutos con 20 topics a 30 Hz ocupa del orden de 100–200 MB; un paso de física de 1 ms en Gazebo son 1000 pasos por segundo simulado. Un URDF con inercias genéricas de 0,001 en vez de los valores medidos cambia por completo la respuesta del brazo. Aleatorizar masa, fricción y retardo al entrenar es la vía estándar para reducir el salto sim-to-real.'),
+        tabla(['Herramienta', 'Punto fuerte', 'Coste o límite', 'Ideal para'], [
+          ['Gazebo', 'Integración ROS 2, sensores y mundos complejos', 'Más pesado y contactos menos precisos', 'Nav2, celdas y robótica móvil'],
+          ['MuJoCo', 'Contacto rápido y estable, buen sim-to-real', 'Menos complementos ROS y licencia propia', 'Manipulación y aprendizaje por refuerzo'],
+          ['Isaac Sim', 'Fotorealismo y GPU para síntesis de datos', 'Requiere hardware NVIDIA y curva de aprendizaje', 'Percepción y flotas grandes']
+        ]),
+        apunte('Por qué es una buena entrada', 'Tu experiencia con sistemas, contenedores, CI y código limpio es directamente transferible. Solo necesitas añadir el vocabulario físico: marcos, inercias, contactos y temporización.'),
+        aviso('El error típico es confiar en el URDF por defecto: masas e inercias genéricas hacen que el robot simulado se mueva como uno distinto. Validación mínima: compara cada marco tf2 con el medido en el real y comprueba que el par de gravedad calculado coincide antes de entrenar cualquier política.'),
+        pasos([
+          { title: '1. Valida el URDF', text: 'check_urdf robot.urdf para detectar errores de sintaxis y eslabones desconectados.' },
+          { title: '2. Arranca la simulación', text: 'gz sim -r world.sdf o ros2 launch gazebo_ros gazebo.launch.py, según tu versión.' },
+          { title: '3. Inspecciona marcos', text: 'ros2 run tf2_tools view_frames y compara el árbol con el del robot real.' },
+          { title: '4. Cierra el ciclo', text: 'Graba un rosbag de 30 s en simulación y en real; compara latencias y trayectorias antes de dar por buena la política.' }
+        ]),
+        enlace('https://gazebosim.org/docs', 'Gazebo', 'Documentación oficial: mundos, sensores, física e integración con ROS 2.')
       ],
+      errors: [err('El brazo simulado no se parece al real', 'Inercias y masas genéricas en el URDF', 'Mide masas e inercias del hardware y compara marcos tf2 y par de gravedad.')],
       practice: { task: 'Modela tu robot en URDF, cárgalo en Gazebo o MuJoCo y comprueba que los marcos tf2 y los parámetros de inercia coinciden con el hardware real.', success: ['URDF carga sin errores', 'Marcos tf2 correctos', 'Comparas simulación con el robot real'] },
       quiz: [q('¿Por qué es una buena entrada en robótica para alguien que viene de SWE?', ['Porque no requiere ningún conocimiento físico', 'Porque la experiencia con contenedores, CI y código limpio es transferible; solo faltan marcos, inercias y contactos', 'Porque evita usar ROS 2', 'Porque no hay que medir nada'], 1, 'El apunte señala que las habilidades de sistemas se transfieren y solo hay que añadir vocabulario físico.')]
     }),
@@ -1485,7 +1612,7 @@ print(f"éxito={p:.0%}, IC95%=[{ci[0]:.0%}, {ci[1]:.0%}]")`, 'Tasa de éxito con
         pasos([
           { title: 'Un concepto por semana', text: 'Elige un tema de esta academia y llévalo a un experimento pequeño.' },
           { title: 'Un proyecto por mes', text: 'Algo que se mueva y tenga README con números y fallos.' },
-          { title: 'Sigue fuentes primarias', text: 'Docs oficiales, papers abiertos y repos con código, no resúmenes en redes.' },
+          { title: 'Sigue fuentes primarias', text: 'Documentación oficial, artículos abiertos y repos con código, no resúmenes en redes.' },
           { title: 'Vuelve a lo básico', text: 'Cuando algo no funcione, baja una capa: del modelo al sensor, del sensor al cable.' }
         ]),
         apunte('La regla de oro', 'Si no lo puedes medir, no sabes si funciona. Un multímetro, un log y un cronómetro son tus mejores profesores.'),

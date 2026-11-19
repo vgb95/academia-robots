@@ -384,7 +384,7 @@ print(stats.poisson.pmf(3, 2.0))          # Poisson (conteos)`, 'La tasa base y 
                 objectives: ['Cuantificar incertidumbre con intervalos', 'Interpretar correctamente tests A/B'],
                 blocks: [
                   p('Un promedio sin incertidumbre no es información: 9/10 y 900/1000 dan la misma tasa pero muy distinta confianza. Bootstrap y tests A/B son herramientas de trabajo diarias en evaluación de modelos.'),
-                  formula('Media μ̂ = (1/n)Σxᵢ        Varianza s² = Σ(xᵢ−μ̂)²/(n−1)        SE ≈ s/√n', 'El error estándar cae con √n: para halvar el error necesitas 4× datos.'),
+                  formula('Media μ̂ = (1/n)Σxᵢ        Varianza s² = Σ(xᵢ−μ̂)²/(n−1)        SE ≈ s/√n', 'El error estándar cae con √n: para reducir el error a la mitad necesitas 4× datos.'),
                   codigo('python', `import numpy as np
 
 rng = np.random.default_rng(0)
